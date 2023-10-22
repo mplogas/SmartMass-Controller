@@ -9,7 +9,7 @@ namespace SmartMass.Controller.Model
     public class Manufacturer
     {
         public int Id { get; private set; }
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         public Manufacturer(string name)
         {

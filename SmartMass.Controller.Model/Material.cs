@@ -20,9 +20,9 @@ namespace SmartMass.Controller.Model
         }
 
         public int Id { get; private set; }
-        public string Type { get; private set; }
-        public int DefaultNozzleTemp { get; private set; } = 0;
-        public int DefaultBedTemp { get; private set; } = 0;
+        public string Type { get; set; }
+        public int DefaultNozzleTemp { get; set; } = 0;
+        public int DefaultBedTemp { get; set; } = 0;
 
     }
 }
