@@ -15,6 +15,8 @@ namespace SmartMass.Controller.Model
         [Display(Name = "Manufacturer name")]
         public string Name { get; set; }
 
+        public List<Spool> Spools { get; set; } = new List<Spool>();
+
         public Manufacturer(string name)
         {
             Name = name;

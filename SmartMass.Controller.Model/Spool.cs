@@ -18,8 +18,12 @@ namespace SmartMass.Controller.Model
         [Range(0,1000, ErrorMessage = "The empty spool weight should be between {1} and {2}")]
         [Display(Name = "Weight of the empty spool")]
         public int EmptySpoolWeight { get; set; } = 0;
+
+        public int ManufacturerId { get; set; }
         public Manufacturer Manufacturer { get; set; }
+        public int MaterialId { get; set; }
         public Material Material { get; set; }
+        
         [RegularExpression(@"^#([0-9a-f]{6}|[0-9a-f]{3})$", ErrorMessage = "The color should be provided as web/hex color, e.g. #FF0000")]
         [Display(Name = "Color of the filament")]
         public string Color { get; set; }

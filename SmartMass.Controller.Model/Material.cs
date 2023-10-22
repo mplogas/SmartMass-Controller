@@ -34,5 +34,7 @@ namespace SmartMass.Controller.Model
         [Display(Name = "Default bed temperature")]
         public int DefaultBedTemp { get; set; } = 0;
 
+        public List<Spool> Spools { get; set; } = new List<Spool>();
+
     }
 }

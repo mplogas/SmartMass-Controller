@@ -1,3 +1,7 @@
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using SmartMass.Controller.Web.Data;
+
 namespace SmartMass.Controller.Web
 {
     public class Program
@@ -5,6 +9,19 @@ namespace SmartMass.Controller.Web
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Configuration
+                .SetBasePath(builder.Environment.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+                .AddUserSecrets(Assembly.GetExecutingAssembly())
+                .AddEnvironmentVariables().Build();
+
+            builder.Services.AddDbContext<SmartMassDbContext>(options =>
+            {
+                var s = builder.Configuration.GetConnectionString("smartmassdb");
+                options.UseSqlite(s);
+            });
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
