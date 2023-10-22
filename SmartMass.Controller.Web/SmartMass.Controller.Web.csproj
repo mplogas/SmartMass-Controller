@@ -13,4 +13,13 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SmartMass.Controller.Model\SmartMass.Controller.Model.csproj" />
+    <ProjectReference Include="..\SmartMass.Controller.MQTT\SmartMass.Controller.Mqtt.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
