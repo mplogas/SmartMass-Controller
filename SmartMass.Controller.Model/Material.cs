@@ -13,12 +13,10 @@ namespace SmartMass.Controller.Model
             Type = type;
         }
 
-        public Material(int id, string type, int defaultNozzleTemp, int defaultBedTemp)
+        public Material(int id, string type)
         {
             Id = id;
             Type = type;
-            DefaultNozzleTemp = defaultNozzleTemp;
-            DefaultBedTemp = defaultBedTemp;
         }
 
         public int Id { get; private set; }
