@@ -1,5 +1,7 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using MQTTnet;
+using MQTTnet.Client;
 using SmartMass.Controller.Web.Data;
 
 namespace SmartMass.Controller.Web
@@ -23,10 +25,18 @@ namespace SmartMass.Controller.Web
                 options.UseSqlite(s);
             });
 
+            builder.Services.AddTransient<MqttFactory>();
+            builder.Services.AddSingleton<Mqtt.IMqttClient, Mqtt.MqttClient>();
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            // connect mqtt client
+            var mqtt = app.Services.GetService<Mqtt.IMqttClient>();
+            mqtt?.Connect(app.Configuration.GetValue<string>("mqtt:host"), app.Configuration.GetValue<string>("mqtt:clientid"),
+                app.Configuration.GetValue<string>("mqtt:user"), app.Configuration.GetValue<string>("mqtt:password")).GetAwaiter().GetResult();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
