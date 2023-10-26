@@ -1,5 +1,65 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<SmartMass.Controller.Model.Device>
+
 @{
+    ViewData["Title"] = "Index";
 }
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CalibrationFactor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ScaleUpdateInterval)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ScaleSamplingSize)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ScaleCalibrationWeight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ScaleDisplayTimeout)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CalibrationFactor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ScaleUpdateInterval)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ScaleSamplingSize)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ScaleCalibrationWeight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ScaleDisplayTimeout)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

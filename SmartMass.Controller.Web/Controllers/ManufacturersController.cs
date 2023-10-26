@@ -10,87 +10,87 @@ using SmartMass.Controller.Web.Data;
 
 namespace SmartMass.Controller.Web.Controllers
 {
-    public class DevicesController : Microsoft.AspNetCore.Mvc.Controller
+    public class ManufacturersController : Microsoft.AspNetCore.Mvc.Controller
     {
         private readonly SmartMassDbContext _context;
 
-        public DevicesController(SmartMassDbContext context)
+        public ManufacturersController(SmartMassDbContext context)
         {
             _context = context;
         }
 
-        // GET: Devices
+        // GET: Manufacturers
         public async Task<IActionResult> Index()
         {
-              return _context.Devices != null ? 
-                          View(await _context.Devices.ToListAsync()) :
-                          Problem("Entity set 'SmartMassDbContext.Devices'  is null.");
+              return _context.Manufacturers != null ? 
+                          View(await _context.Manufacturers.ToListAsync()) :
+                          Problem("Entity set 'SmartMassDbContext.Manufacturers'  is null.");
         }
 
-        // GET: Devices/Details/5
+        // GET: Manufacturers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || _context.Manufacturers == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices
+            var manufacturer = await _context.Manufacturers
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (device == null)
+            if (manufacturer == null)
             {
                 return NotFound();
             }
 
-            return View(device);
+            return View(manufacturer);
         }
 
-        // GET: Devices/Create
+        // GET: Manufacturers/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Devices/Create
+        // POST: Manufacturers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CalibrationFactor,ScaleUpdateInterval,ScaleSamplingSize,ScaleCalibrationWeight,ScaleDisplayTimeout")] Device device)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Manufacturer manufacturer)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(device);
+                _context.Add(manufacturer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(device);
+            return View(manufacturer);
         }
 
-        // GET: Devices/Edit/5
+        // GET: Manufacturers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || _context.Manufacturers == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices.FindAsync(id);
-            if (device == null)
+            var manufacturer = await _context.Manufacturers.FindAsync(id);
+            if (manufacturer == null)
             {
                 return NotFound();
             }
-            return View(device);
+            return View(manufacturer);
         }
 
-        // POST: Devices/Edit/5
+        // POST: Manufacturers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CalibrationFactor,ScaleUpdateInterval,ScaleSamplingSize,ScaleCalibrationWeight,ScaleDisplayTimeout")] Device device)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Manufacturer manufacturer)
         {
-            if (id != device.Id)
+            if (id != manufacturer.Id)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace SmartMass.Controller.Web.Controllers
             {
                 try
                 {
-                    _context.Update(device);
+                    _context.Update(manufacturer);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DeviceExists(device.Id))
+                    if (!ManufacturerExists(manufacturer.Id))
                     {
                         return NotFound();
                     }
@@ -115,49 +115,49 @@ namespace SmartMass.Controller.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(device);
+            return View(manufacturer);
         }
 
-        // GET: Devices/Delete/5
+        // GET: Manufacturers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || _context.Manufacturers == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices
+            var manufacturer = await _context.Manufacturers
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (device == null)
+            if (manufacturer == null)
             {
                 return NotFound();
             }
 
-            return View(device);
+            return View(manufacturer);
         }
 
-        // POST: Devices/Delete/5
+        // POST: Manufacturers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Devices == null)
+            if (_context.Manufacturers == null)
             {
-                return Problem("Entity set 'SmartMassDbContext.Devices'  is null.");
+                return Problem("Entity set 'SmartMassDbContext.Manufacturers'  is null.");
             }
-            var device = await _context.Devices.FindAsync(id);
-            if (device != null)
+            var manufacturer = await _context.Manufacturers.FindAsync(id);
+            if (manufacturer != null)
             {
-                _context.Devices.Remove(device);
+                _context.Manufacturers.Remove(manufacturer);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DeviceExists(int id)
+        private bool ManufacturerExists(int id)
         {
-          return (_context.Devices?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Manufacturers?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

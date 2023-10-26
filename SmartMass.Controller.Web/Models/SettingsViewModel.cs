@@ -1,6 +1,7 @@
 ﻿namespace SmartMass.Controller.Web.Models
 {
-    public class InventoryViewModel
+    public class SettingsViewModel
     {
+        
     }
 }

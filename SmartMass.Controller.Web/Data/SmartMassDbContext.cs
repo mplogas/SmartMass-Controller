@@ -8,7 +8,7 @@ namespace SmartMass.Controller.Web.Data
     {
         public SmartMassDbContext(DbContextOptions<SmartMassDbContext> options) : base (options)
         {
-            ConfigureDatabase();
+            //ConfigureDatabase();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -52,15 +52,15 @@ namespace SmartMass.Controller.Web.Data
             modelBuilder.Entity<Spool>().Property(p => p.BedTemp).HasDefaultValue(0);
             modelBuilder.Entity<Spool>().Property(p => p.Color).IsRequired();
             modelBuilder.Entity<Spool>().HasOne(s => s.Manufacturer).WithMany(s => s.Spools)
-                .HasForeignKey(s => s.ManufacturerId);
+                .HasForeignKey(s => s.ManufacturerId).IsRequired();
             modelBuilder.Entity<Spool>().HasOne(s => s.Material).WithMany(s => s.Spools)
-                .HasForeignKey(s => s.MaterialId);
+                .HasForeignKey(s => s.MaterialId).IsRequired();
             modelBuilder.Entity<Spool>().Property(p => p.Created).HasDefaultValue(DateTime.UtcNow);
 
             modelBuilder.Entity<Device>().HasKey(k => k.Id);
             modelBuilder.Entity<Device>().Property(p => p.Name).IsRequired();
             modelBuilder.Entity<Device>().Property(p => p.CalibrationFactor).HasDefaultValue(981).IsRequired();
-            modelBuilder.Entity<Device>().Property(p => p.ScaleUpdateIntervall).HasDefaultValue(1000).IsRequired();
+            modelBuilder.Entity<Device>().Property(p => p.ScaleUpdateInterval).HasDefaultValue(1000).IsRequired();
             modelBuilder.Entity<Device>().Property(p => p.ScaleSamplingSize).HasDefaultValue(1).IsRequired();
             modelBuilder.Entity<Device>().Property(p => p.ScaleCalibrationWeight).HasDefaultValue(100).IsRequired();
             modelBuilder.Entity<Device>().Property(p => p.ScaleDisplayTimeout).HasDefaultValue(60000).IsRequired();

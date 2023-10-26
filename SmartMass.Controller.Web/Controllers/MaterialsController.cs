@@ -10,87 +10,87 @@ using SmartMass.Controller.Web.Data;
 
 namespace SmartMass.Controller.Web.Controllers
 {
-    public class DevicesController : Microsoft.AspNetCore.Mvc.Controller
+    public class MaterialsController : Microsoft.AspNetCore.Mvc.Controller
     {
         private readonly SmartMassDbContext _context;
 
-        public DevicesController(SmartMassDbContext context)
+        public MaterialsController(SmartMassDbContext context)
         {
             _context = context;
         }
 
-        // GET: Devices
+        // GET: Materials
         public async Task<IActionResult> Index()
         {
-              return _context.Devices != null ? 
-                          View(await _context.Devices.ToListAsync()) :
-                          Problem("Entity set 'SmartMassDbContext.Devices'  is null.");
+              return _context.Materials != null ? 
+                          View(await _context.Materials.ToListAsync()) :
+                          Problem("Entity set 'SmartMassDbContext.Materials'  is null.");
         }
 
-        // GET: Devices/Details/5
+        // GET: Materials/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || _context.Materials == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices
+            var material = await _context.Materials
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (device == null)
+            if (material == null)
             {
                 return NotFound();
             }
 
-            return View(device);
+            return View(material);
         }
 
-        // GET: Devices/Create
+        // GET: Materials/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Devices/Create
+        // POST: Materials/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CalibrationFactor,ScaleUpdateInterval,ScaleSamplingSize,ScaleCalibrationWeight,ScaleDisplayTimeout")] Device device)
+        public async Task<IActionResult> Create([Bind("Id,Type,DefaultNozzleTemp,DefaultBedTemp")] Material material)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(device);
+                _context.Add(material);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(device);
+            return View(material);
         }
 
-        // GET: Devices/Edit/5
+        // GET: Materials/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || _context.Materials == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices.FindAsync(id);
-            if (device == null)
+            var material = await _context.Materials.FindAsync(id);
+            if (material == null)
             {
                 return NotFound();
             }
-            return View(device);
+            return View(material);
         }
 
-        // POST: Devices/Edit/5
+        // POST: Materials/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CalibrationFactor,ScaleUpdateInterval,ScaleSamplingSize,ScaleCalibrationWeight,ScaleDisplayTimeout")] Device device)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,DefaultNozzleTemp,DefaultBedTemp")] Material material)
         {
-            if (id != device.Id)
+            if (id != material.Id)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace SmartMass.Controller.Web.Controllers
             {
                 try
                 {
-                    _context.Update(device);
+                    _context.Update(material);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DeviceExists(device.Id))
+                    if (!MaterialExists(material.Id))
                     {
                         return NotFound();
                     }
@@ -115,49 +115,49 @@ namespace SmartMass.Controller.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(device);
+            return View(material);
         }
 
-        // GET: Devices/Delete/5
+        // GET: Materials/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || _context.Materials == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices
+            var material = await _context.Materials
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (device == null)
+            if (material == null)
             {
                 return NotFound();
             }
 
-            return View(device);
+            return View(material);
         }
 
-        // POST: Devices/Delete/5
+        // POST: Materials/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Devices == null)
+            if (_context.Materials == null)
             {
-                return Problem("Entity set 'SmartMassDbContext.Devices'  is null.");
+                return Problem("Entity set 'SmartMassDbContext.Materials'  is null.");
             }
-            var device = await _context.Devices.FindAsync(id);
-            if (device != null)
+            var material = await _context.Materials.FindAsync(id);
+            if (material != null)
             {
-                _context.Devices.Remove(device);
+                _context.Materials.Remove(material);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DeviceExists(int id)
+        private bool MaterialExists(int id)
         {
-          return (_context.Devices?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Materials?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

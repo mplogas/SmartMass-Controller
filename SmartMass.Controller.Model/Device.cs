@@ -10,31 +10,32 @@ namespace SmartMass.Controller.Model
 {
     public  class Device
     {
-        public int Id { get; private set; }
+        public int Id { get; set; }
+
         [Required]
         [StringLength(50, ErrorMessage = "Name for the device should not exceed 50 characters.")]
-        [Display(Name = "Material name")]
-        public string Name { get; private set; } //clientid
+        [Display(Name = "Device name / Client-Id")]
+        public string Name { get; set; } = string.Empty; //clientid
 
+        [Required]
         [Display(Name = "Calibration factor for the scale")]
         public int CalibrationFactor { get; set; } = 981;
 
-        // TODO: DataAnnotations for remaining properties
-        public int ScaleUpdateIntervall { get; set; } = 1000; //milliseconds
+        [Range(500, 3600000, ErrorMessage = "The sensor update interval should be between {1} and {2}.")]
+        [Display(Name = "sensor update interval (in ms)")]
+        public int ScaleUpdateInterval { get; set; } = 1000; //milliseconds
+
+        [Range(1, 5, ErrorMessage = "The sensor sampling size should be between {1} and {2} to avoid HX711 read errors.")]
+        [Display(Name = "sensor sampling size (values)")]
         public int ScaleSamplingSize { get; set; } = 1;
+
+        [Range(1, 1500, ErrorMessage = "The weight used for calibration should be between {1} and {2}.")]
+        [Display(Name = "calibrated weight")]
         public int ScaleCalibrationWeight { get; set; } = 100;
+
+        [Range(1, 21600000, ErrorMessage = "The display timeout should be between {1} and {2} to avoid burn-in.")]
+        [Display(Name = "display timeout (in ms)")]
         public int ScaleDisplayTimeout { get; set; } = 60000; //milliseconds
-
-        public Device(string name)
-        {
-            Name = name;
-        }
-
-        public Device(int id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
 
     }
 }

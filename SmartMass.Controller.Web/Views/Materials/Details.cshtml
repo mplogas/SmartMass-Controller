@@ -1,0 +1,36 @@
+﻿@model SmartMass.Controller.Model.Material
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Material</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DefaultNozzleTemp)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DefaultNozzleTemp)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DefaultBedTemp)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DefaultBedTemp)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
