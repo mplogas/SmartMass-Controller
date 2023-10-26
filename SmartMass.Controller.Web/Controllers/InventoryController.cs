@@ -61,11 +61,16 @@ namespace SmartMass.Controller.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Created,EmptySpoolWeight,ManufacturerId,MaterialId,Color,NozzleTemp,BedTemp")] Spool spool)
         {
-
+            //setting up some stuff to satisfy the validator
+            //TODO: viewmodels and stuff. 
             spool.Id = Guid.NewGuid();
             spool.Created = DateTime.UtcNow;
             spool.Manufacturer = _context.Manufacturers.Single(m => m.Id == spool.ManufacturerId);
             spool.Material = _context.Materials.Single(m => m.Id == spool.MaterialId);
+            ModelState.ClearValidationState(nameof(Manufacturer));
+            TryValidateModel(spool.Manufacturer, nameof(Manufacturer));
+            ModelState.ClearValidationState(nameof(Material));
+            TryValidateModel(spool.Material, nameof(Material));
             ModelState.ClearValidationState(nameof(Spool));
             TryValidateModel(spool, nameof(Spool));
 
