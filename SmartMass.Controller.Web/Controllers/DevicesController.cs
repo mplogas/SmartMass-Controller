@@ -6,36 +6,41 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SmartMass.Controller.Model;
+using SmartMass.Controller.Mqtt;
 using SmartMass.Controller.Web.Data;
 
 namespace SmartMass.Controller.Web.Controllers
 {
     public class DevicesController : Microsoft.AspNetCore.Mvc.Controller
     {
-        private readonly SmartMassDbContext _context;
+        private readonly SmartMassDbContext dbContext;
+        private readonly ILogger<DevicesController> logger;
+        private readonly IMqttClient mqttClient;
 
-        public DevicesController(SmartMassDbContext context)
+        public DevicesController(ILogger<DevicesController> logger, SmartMassDbContext dbContext, Mqtt.IMqttClient mqttClient)
         {
-            _context = context;
+            this.logger = logger;
+            this.dbContext = dbContext;
+            this.mqttClient = mqttClient;
         }
 
         // GET: Devices
         public async Task<IActionResult> Index()
         {
-              return _context.Devices != null ? 
-                          View(await _context.Devices.ToListAsync()) :
+              return dbContext.Devices != null ? 
+                          View(await dbContext.Devices.ToListAsync()) :
                           Problem("Entity set 'SmartMassDbContext.Devices'  is null.");
         }
 
         // GET: Devices/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || dbContext.Devices == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices
+            var device = await dbContext.Devices
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (device == null)
             {
@@ -60,8 +65,8 @@ namespace SmartMass.Controller.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(device);
-                await _context.SaveChangesAsync();
+                dbContext.Add(device);
+                await dbContext.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(device);
@@ -70,12 +75,12 @@ namespace SmartMass.Controller.Web.Controllers
         // GET: Devices/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || dbContext.Devices == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices.FindAsync(id);
+            var device = await dbContext.Devices.FindAsync(id);
             if (device == null)
             {
                 return NotFound();
@@ -99,8 +104,8 @@ namespace SmartMass.Controller.Web.Controllers
             {
                 try
                 {
-                    _context.Update(device);
-                    await _context.SaveChangesAsync();
+                    dbContext.Update(device);
+                    await dbContext.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -121,12 +126,12 @@ namespace SmartMass.Controller.Web.Controllers
         // GET: Devices/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Devices == null)
+            if (id == null || dbContext.Devices == null)
             {
                 return NotFound();
             }
 
-            var device = await _context.Devices
+            var device = await dbContext.Devices
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (device == null)
             {
@@ -141,23 +146,23 @@ namespace SmartMass.Controller.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Devices == null)
+            if (dbContext.Devices == null)
             {
                 return Problem("Entity set 'SmartMassDbContext.Devices'  is null.");
             }
-            var device = await _context.Devices.FindAsync(id);
+            var device = await dbContext.Devices.FindAsync(id);
             if (device != null)
             {
-                _context.Devices.Remove(device);
+                dbContext.Devices.Remove(device);
             }
             
-            await _context.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool DeviceExists(int id)
         {
-          return (_context.Devices?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (dbContext.Devices?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
