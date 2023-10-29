@@ -78,7 +78,8 @@ public class DevicesController : ControllerBase
                 return Problem(e.Message);
             }
 
-            return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
+            device.Id = dto.Id;
+            return CreatedAtAction(nameof(Get), new { id = dto.Id }, device);
         }
 
         return BadRequest(ModelState);

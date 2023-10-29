@@ -3,7 +3,7 @@ using SmartMass.Controller.Model.PageModels;
 
 namespace SmartMass.Controller.Model.Mapping
 {
-    public static class DeviceDTOExtension
+    public static class DeviceDtoExtension
     {
         public static void MapFrom(this DeviceDTO dto, Device pageModel)
         {

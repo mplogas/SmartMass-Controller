@@ -72,7 +72,8 @@ public class ManufacturersController : ControllerBase
                 return Problem(e.Message);
             }
 
-            return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
+            manufacturer.Id = dto.Id;
+            return CreatedAtAction(nameof(Get), new { id = dto.Id }, manufacturer);
         }
 
         return BadRequest(ModelState);

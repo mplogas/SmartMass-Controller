@@ -4,8 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 ## own additions
-**/Database/Migrations/*
-**/Database/smartmass.db*
+**/Database
+**/Migrations
 
 
 # User-specific files
