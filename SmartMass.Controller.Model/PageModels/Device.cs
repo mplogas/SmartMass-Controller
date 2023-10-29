@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SmartMass.Controller.Model.PageModels
 {
@@ -14,7 +9,7 @@ namespace SmartMass.Controller.Model.PageModels
         [Required]
         [StringLength(50, ErrorMessage = "Name for the device should not exceed 50 characters.")]
         [Display(Name = "Device name")]
-        public string Name { get; set; } = string.Empty; //clientid
+        public string Name { get; set; } = string.Empty;
 
         [Required]
         [Display(Name = "Calibration factor for the scale")]
