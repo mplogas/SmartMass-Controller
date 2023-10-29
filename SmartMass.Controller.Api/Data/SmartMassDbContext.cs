@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using SmartMass.Controller.Model.DTOs;
 
-namespace SmartMass.Controller.Web.Data
+namespace SmartMass.Controller.Api.Data
 {
     public class SmartMassDbContext : DbContext
     {

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using SmartMass.Controller.Model;
+using SmartMass.Controller.Model.DTOs;
 using SmartMass.Controller.Web.Data;
 
 namespace SmartMass.Controller.Web.Controllers
@@ -56,15 +56,15 @@ namespace SmartMass.Controller.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Manufacturer manufacturer)
+        public async Task<IActionResult> Create([Bind("Id,Name")] ManufacturerDTO manufacturerDto)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(manufacturer);
+                _context.Add(manufacturerDto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(manufacturer);
+            return View(manufacturerDto);
         }
 
         // GET: Manufacturers/Edit/5
@@ -88,9 +88,9 @@ namespace SmartMass.Controller.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Manufacturer manufacturer)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] ManufacturerDTO manufacturerDto)
         {
-            if (id != manufacturer.Id)
+            if (id != manufacturerDto.Id)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace SmartMass.Controller.Web.Controllers
             {
                 try
                 {
-                    _context.Update(manufacturer);
+                    _context.Update(manufacturerDto);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ManufacturerExists(manufacturer.Id))
+                    if (!ManufacturerExists(manufacturerDto.Id))
                     {
                         return NotFound();
                     }
@@ -115,7 +115,7 @@ namespace SmartMass.Controller.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(manufacturer);
+            return View(manufacturerDto);
         }
 
         // GET: Manufacturers/Delete/5

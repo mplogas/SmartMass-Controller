@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using SmartMass.Controller.Model;
+using SmartMass.Controller.Model.DTOs;
 using SmartMass.Controller.Web.Data;
 
 namespace SmartMass.Controller.Web.Controllers
@@ -22,7 +22,7 @@ namespace SmartMass.Controller.Web.Controllers
         // GET: Inventory
         public async Task<IActionResult> Index()
         {
-            var smartMassDbContext = _context.Spools.Include(s => s.Manufacturer).Include(s => s.Material);
+            var smartMassDbContext = _context.Spools.Include(s => s.ManufacturerDto).Include(s => s.MaterialDto);
             return View(await smartMassDbContext.ToListAsync());
         }
 
@@ -35,8 +35,8 @@ namespace SmartMass.Controller.Web.Controllers
             }
 
             var spool = await _context.Spools
-                .Include(s => s.Manufacturer)
-                .Include(s => s.Material)
+                .Include(s => s.ManufacturerDto)
+                .Include(s => s.MaterialDto)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (spool == null)
             {
@@ -59,24 +59,24 @@ namespace SmartMass.Controller.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Created,EmptySpoolWeight,ManufacturerId,MaterialId,Color,NozzleTemp,BedTemp")] Spool spool)
+        public async Task<IActionResult> Create([Bind("Id,Name,Created,EmptySpoolWeight,ManufacturerId,MaterialId,Color,NozzleTemp,BedTemp")] SpoolDTO spoolDto)
         {
             //setting up some stuff to satisfy the validator
             //TODO: viewmodels and stuff. 
-            spool.Id = Guid.NewGuid();
-            spool.Created = DateTime.UtcNow;
-            spool.Manufacturer = _context.Manufacturers.Single(m => m.Id == spool.ManufacturerId);
-            spool.Material = _context.Materials.Single(m => m.Id == spool.MaterialId);
-            ModelState.ClearValidationState(nameof(Manufacturer));
-            TryValidateModel(spool.Manufacturer, nameof(Manufacturer));
-            ModelState.ClearValidationState(nameof(Material));
-            TryValidateModel(spool.Material, nameof(Material));
-            ModelState.ClearValidationState(nameof(Spool));
-            TryValidateModel(spool, nameof(Spool));
+            spoolDto.Id = Guid.NewGuid();
+            spoolDto.Created = DateTime.UtcNow;
+            spoolDto.ManufacturerDto = _context.Manufacturers.Single(m => m.Id == spoolDto.ManufacturerId);
+            spoolDto.MaterialDto = _context.Materials.Single(m => m.Id == spoolDto.MaterialId);
+            ModelState.ClearValidationState(nameof(ManufacturerDTO));
+            TryValidateModel(spoolDto.ManufacturerDto, nameof(ManufacturerDTO));
+            ModelState.ClearValidationState(nameof(MaterialDTO));
+            TryValidateModel(spoolDto.MaterialDto, nameof(MaterialDTO));
+            ModelState.ClearValidationState(nameof(SpoolDTO));
+            TryValidateModel(spoolDto, nameof(SpoolDTO));
 
             if (ModelState.IsValid)
             {
-                _context.Add(spool);
+                _context.Add(spoolDto);
                 var result = await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -84,9 +84,9 @@ namespace SmartMass.Controller.Web.Controllers
             {
                 var number = ModelState.ErrorCount;
             }
-            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Name", spool.ManufacturerId);
-            ViewData["MaterialId"] = new SelectList(_context.Materials, "Id", "Type", spool.MaterialId);
-            return View(spool);
+            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Name", spoolDto.ManufacturerId);
+            ViewData["MaterialId"] = new SelectList(_context.Materials, "Id", "Type", spoolDto.MaterialId);
+            return View(spoolDto);
         }
 
         // GET: Inventory/Edit/5
@@ -112,9 +112,9 @@ namespace SmartMass.Controller.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,Created,EmptySpoolWeight,ManufacturerId,MaterialId,Color,NozzleTemp,BedTemp")] Spool spool)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,Created,EmptySpoolWeight,ManufacturerId,MaterialId,Color,NozzleTemp,BedTemp")] SpoolDTO spoolDto)
         {
-            if (id != spool.Id)
+            if (id != spoolDto.Id)
             {
                 return NotFound();
             }
@@ -123,12 +123,12 @@ namespace SmartMass.Controller.Web.Controllers
             {
                 try
                 {
-                    _context.Update(spool);
+                    _context.Update(spoolDto);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SpoolExists(spool.Id))
+                    if (!SpoolExists(spoolDto.Id))
                     {
                         return NotFound();
                     }
@@ -139,9 +139,9 @@ namespace SmartMass.Controller.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Name", spool.ManufacturerId);
-            ViewData["MaterialId"] = new SelectList(_context.Materials, "Id", "Type", spool.MaterialId);
-            return View(spool);
+            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Name", spoolDto.ManufacturerId);
+            ViewData["MaterialId"] = new SelectList(_context.Materials, "Id", "Type", spoolDto.MaterialId);
+            return View(spoolDto);
         }
 
         // GET: Inventory/Delete/5
@@ -153,8 +153,8 @@ namespace SmartMass.Controller.Web.Controllers
             }
 
             var spool = await _context.Spools
-                .Include(s => s.Manufacturer)
-                .Include(s => s.Material)
+                .Include(s => s.ManufacturerDto)
+                .Include(s => s.MaterialDto)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (spool == null)
             {

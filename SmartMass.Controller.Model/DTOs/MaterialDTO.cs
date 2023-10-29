@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartMass.Controller.Model
+namespace SmartMass.Controller.Model.DTOs
 {
-    public class Material
+    public class MaterialDTO
     {
 
         public int Id { get; set; }
@@ -24,7 +24,7 @@ namespace SmartMass.Controller.Model
         [Display(Name = "Default bed temperature")]
         public int DefaultBedTemp { get; set; } = 0;
 
-        public List<Spool> Spools { get; set; } = new();
+        public List<SpoolDTO> Spools { get; set; } = new();
 
     }
 }

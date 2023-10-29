@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartMass.Controller.Model
+namespace SmartMass.Controller.Model.DTOs
 {
-    public class Manufacturer
+    public class ManufacturerDTO
     {
         public int Id { get; set; }
         [Required]
@@ -15,6 +15,6 @@ namespace SmartMass.Controller.Model
         [Display(Name = "Manufacturer name")]
         public string Name { get; set; } = string.Empty;
 
-        public List<Spool> Spools { get; set; } = new List<Spool>();
+        public List<SpoolDTO> Spools { get; set; } = new List<SpoolDTO>();
     }
 }

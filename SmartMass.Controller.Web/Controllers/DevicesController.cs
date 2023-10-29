@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using SmartMass.Controller.Model;
+using SmartMass.Controller.Model.DTOs;
 using SmartMass.Controller.Mqtt;
 using SmartMass.Controller.Web.Data;
 
@@ -61,15 +61,15 @@ namespace SmartMass.Controller.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CalibrationFactor,ScaleUpdateInterval,ScaleSamplingSize,ScaleCalibrationWeight,ScaleDisplayTimeout")] Device device)
+        public async Task<IActionResult> Create([Bind("Id,Name,CalibrationFactor,ScaleUpdateInterval,ScaleSamplingSize,ScaleCalibrationWeight,ScaleDisplayTimeout")] DeviceDTO deviceDto)
         {
             if (ModelState.IsValid)
             {
-                dbContext.Add(device);
+                dbContext.Add(deviceDto);
                 await dbContext.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(device);
+            return View(deviceDto);
         }
 
         // GET: Devices/Edit/5
@@ -93,9 +93,9 @@ namespace SmartMass.Controller.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CalibrationFactor,ScaleUpdateInterval,ScaleSamplingSize,ScaleCalibrationWeight,ScaleDisplayTimeout")] Device device)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CalibrationFactor,ScaleUpdateInterval,ScaleSamplingSize,ScaleCalibrationWeight,ScaleDisplayTimeout")] DeviceDTO deviceDto)
         {
-            if (id != device.Id)
+            if (id != deviceDto.Id)
             {
                 return NotFound();
             }
@@ -104,12 +104,12 @@ namespace SmartMass.Controller.Web.Controllers
             {
                 try
                 {
-                    dbContext.Update(device);
+                    dbContext.Update(deviceDto);
                     await dbContext.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DeviceExists(device.Id))
+                    if (!DeviceExists(deviceDto.Id))
                     {
                         return NotFound();
                     }
@@ -120,7 +120,7 @@ namespace SmartMass.Controller.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(device);
+            return View(deviceDto);
         }
 
         // GET: Devices/Delete/5

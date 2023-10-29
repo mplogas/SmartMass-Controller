@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartMass.Controller.Model
+namespace SmartMass.Controller.Model.DTOs
 {
-    public class MqttValue
+    public class MqttLogEntryDTO
     {
-        public MqttValue(long id, Guid spoolId, long value, DateTime received)
+        public MqttLogEntryDTO(long id, Guid spoolId, long value, DateTime received)
         {
             Id = id;
             SpoolId = spoolId;

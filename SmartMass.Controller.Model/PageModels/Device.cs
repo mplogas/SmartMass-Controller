@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartMass.Controller.Model
+namespace SmartMass.Controller.Model.PageModels
 {
-    public  class Device
+    public class Device 
     {
         public int Id { get; set; }
 
         [Required]
         [StringLength(50, ErrorMessage = "Name for the device should not exceed 50 characters.")]
-        [Display(Name = "Device name / Client-Id")]
+        [Display(Name = "Device name")]
         public string Name { get; set; } = string.Empty; //clientid
 
         [Required]
@@ -33,9 +32,8 @@ namespace SmartMass.Controller.Model
         [Display(Name = "calibrated weight")]
         public int ScaleCalibrationWeight { get; set; } = 100;
 
-        [Range(1, 21600000, ErrorMessage = "The display timeout should be between {1} and {2} to avoid burn-in.")]
-        [Display(Name = "display timeout (in ms)")]
-        public int ScaleDisplayTimeout { get; set; } = 60000; //milliseconds
-
+        [Range(1, 21600, ErrorMessage = "The display timeout should be between {1} and {2} to avoid burn-in.")]
+        [Display(Name = "display timeout (in s)")]
+        public int ScaleDisplayTimeout { get; set; } = 60; //seconds!
     }
 }

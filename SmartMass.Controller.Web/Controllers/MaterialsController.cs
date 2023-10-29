@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using SmartMass.Controller.Model;
+using SmartMass.Controller.Model.DTOs;
 using SmartMass.Controller.Web.Data;
 
 namespace SmartMass.Controller.Web.Controllers
@@ -56,15 +56,15 @@ namespace SmartMass.Controller.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Type,DefaultNozzleTemp,DefaultBedTemp")] Material material)
+        public async Task<IActionResult> Create([Bind("Id,Type,DefaultNozzleTemp,DefaultBedTemp")] MaterialDTO materialDto)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(material);
+                _context.Add(materialDto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(material);
+            return View(materialDto);
         }
 
         // GET: Materials/Edit/5
@@ -88,9 +88,9 @@ namespace SmartMass.Controller.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,DefaultNozzleTemp,DefaultBedTemp")] Material material)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,DefaultNozzleTemp,DefaultBedTemp")] MaterialDTO materialDto)
         {
-            if (id != material.Id)
+            if (id != materialDto.Id)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace SmartMass.Controller.Web.Controllers
             {
                 try
                 {
-                    _context.Update(material);
+                    _context.Update(materialDto);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MaterialExists(material.Id))
+                    if (!MaterialExists(materialDto.Id))
                     {
                         return NotFound();
                     }
@@ -115,7 +115,7 @@ namespace SmartMass.Controller.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(material);
+            return View(materialDto);
         }
 
         // GET: Materials/Delete/5
