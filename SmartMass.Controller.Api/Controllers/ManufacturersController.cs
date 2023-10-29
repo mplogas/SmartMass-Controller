@@ -14,9 +14,9 @@ namespace SmartMass.Controller.Api.Controllers;
 public class ManufacturersController : ControllerBase
 {
     private readonly SmartMassDbContext dbContext;
-    private readonly ILogger<DevicesController> logger;
+    private readonly ILogger<ManufacturersController> logger;
 
-    public ManufacturersController(ILogger<DevicesController> logger, SmartMassDbContext dbContext)
+    public ManufacturersController(ILogger<ManufacturersController> logger, SmartMassDbContext dbContext)
     {
         this.logger = logger;
         this.dbContext = dbContext;
