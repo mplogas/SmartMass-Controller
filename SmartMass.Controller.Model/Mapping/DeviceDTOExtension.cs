@@ -7,24 +7,16 @@ namespace SmartMass.Controller.Model.Mapping
     {
         public static void MapFrom(this DeviceDTO dto, Device pageModel)
         {
-            dto.CreateFrom(pageModel);
+            dto.Map(pageModel);
             dto.Id = pageModel.Id;
-            //dto.Name = pageModel.Name;
-            //dto.CalibrationFactor = pageModel.CalibrationFactor;
-            //dto.ScaleCalibrationWeight = pageModel.ScaleCalibrationWeight;
-            //dto.ScaleSamplingSize = pageModel.ScaleSamplingSize;
-            //dto.ScaleUpdateInterval = pageModel.ScaleUpdateInterval;
-            //dto.ScaleDisplayTimeout = pageModel.ScaleDisplayTimeout * 1000;
+            dto.Updated = DateTime.UtcNow;
         }
 
         public static void CreateFrom(this DeviceDTO dto, Device pageModel)
         {
-            dto.Name = pageModel.Name;
-            dto.CalibrationFactor = pageModel.CalibrationFactor;
-            dto.ScaleCalibrationWeight = pageModel.ScaleCalibrationWeight;
-            dto.ScaleSamplingSize = pageModel.ScaleSamplingSize;
-            dto.ScaleUpdateInterval = pageModel.ScaleUpdateInterval;
-            dto.ScaleDisplayTimeout = pageModel.ScaleDisplayTimeout * 1000;
+            dto.Map(pageModel);
+            dto.Created = DateTime.UtcNow;
+            dto.Updated = DateTime.UtcNow;
         }
 
         public static Device MapTo(this DeviceDTO dto)
@@ -41,5 +33,14 @@ namespace SmartMass.Controller.Model.Mapping
             };
         }
 
+        private static void Map(this DeviceDTO dto, Device pageModel)
+        {
+            dto.Name = pageModel.Name;
+            dto.CalibrationFactor = pageModel.CalibrationFactor;
+            dto.ScaleCalibrationWeight = pageModel.ScaleCalibrationWeight;
+            dto.ScaleSamplingSize = pageModel.ScaleSamplingSize;
+            dto.ScaleUpdateInterval = pageModel.ScaleUpdateInterval;
+            dto.ScaleDisplayTimeout = pageModel.ScaleDisplayTimeout * 1000;
+        }
     }
 }

@@ -12,13 +12,16 @@ namespace SmartMass.Controller.Model.Mapping
     {
         public static void CreateFrom(this ManufacturerDTO dto, Manufacturer pageModel)
         {
-            dto.Name = pageModel.Name;
+            dto.Map(pageModel);
+            dto.Created = DateTime.UtcNow;
+            dto.Updated = DateTime.UtcNow;
         }
 
         public static void MapFrom(this ManufacturerDTO dto, Manufacturer pageModel)
         {
-            dto.CreateFrom(pageModel);
+            dto.Map(pageModel);
             dto.Id = pageModel.Id;
+            dto.Updated = DateTime.UtcNow;
         }
 
         public static Manufacturer MapTo(this ManufacturerDTO dto)
@@ -28,6 +31,11 @@ namespace SmartMass.Controller.Model.Mapping
                 Id = dto.Id,
                 Name = dto.Name
             };
+        }
+
+        private static void Map(this ManufacturerDTO dto, Manufacturer pageModel)
+        {
+            dto.Name = pageModel.Name;
         }
     }
 }
