@@ -1,8 +1,12 @@
-﻿using System.Reflection.Metadata.Ecma335;
+﻿using System.Linq.Expressions;
+using System.Reflection.Metadata.Ecma335;
+using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.FileProviders;
+using Newtonsoft.Json;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Model.DTOs;
 using SmartMass.Controller.Model.Mapping;
@@ -19,12 +23,14 @@ namespace SmartMass.Controller.Api.Controllers
         private readonly SmartMassDbContext dbContext;
         private readonly ILogger<DevicesController> logger;
         private readonly Mqtt.IMqttClient mqttClient;
+        private readonly string mqttTopicBase = string.Empty;
 
-        public DevicesController(ILogger<DevicesController> logger, SmartMassDbContext dbContext, Mqtt.IMqttClient mqttClient)
+        public DevicesController(ILogger<DevicesController> logger, IConfiguration config, SmartMassDbContext dbContext, Mqtt.IMqttClient mqttClient)
         {
             this.logger = logger;
             this.dbContext = dbContext;
             this.mqttClient = mqttClient;
+            this.mqttTopicBase = config.GetValue<string>("mqtt:topic");
         }
 
         // GET: api/<DevicesController>
@@ -84,6 +90,92 @@ namespace SmartMass.Controller.Api.Controllers
                 return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
             }
             else return BadRequest(ModelState);
+        }
+
+        [HttpPost("{id}/configure")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Configure(int id)
+        {
+            try
+            {
+                var dto = await dbContext.Devices.FindAsync(id);
+                if (dto == null) return NotFound();
+
+                dynamic dynObj = new
+                {
+                    action = "configure",
+                    scale = new
+                    {
+                        update_interval = dto.ScaleUpdateInterval,
+                        sampling_size = dto.ScaleSamplingSize,
+                        calibration = dto.CalibrationFactor,
+                        known_weight = dto.ScaleCalibrationWeight
+                    },
+                    display = new
+                    {
+                        display_timeout = dto.ScaleDisplayTimeout
+                    }
+                };
+
+                mqttClient.Publish(BuildMqttTopic(this.mqttTopicBase, dto.ClientId), JsonConvert.SerializeObject(dynObj));
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
+
+        [HttpPost("{id}/tare")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Tare(int id)
+        {
+            try
+            {
+                var dto = await dbContext.Devices.FindAsync(id);
+                if (dto == null) return NotFound();
+
+                dynamic dynObj = new
+                {
+                    action = "tare"
+                };
+
+                mqttClient.Publish(BuildMqttTopic(this.mqttTopicBase, dto.ClientId), JsonConvert.SerializeObject(dynObj));
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
+
+        [HttpPost("{id}/calibrate")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Calibrate(int id)
+        {
+            try
+            {
+                var dto = await dbContext.Devices.FindAsync(id);
+                if (dto == null) return NotFound();
+
+                dynamic dynObj = new
+                {
+                    action = "calibrate"
+                };
+
+                mqttClient.Publish(BuildMqttTopic(this.mqttTopicBase, dto.ClientId), Convert.ToString(dynObj));
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
         }
 
         // PUT api/<DevicesController>/5
@@ -151,6 +243,35 @@ namespace SmartMass.Controller.Api.Controllers
         private bool DeviceExists(long id)
         {
             return this.dbContext.Devices.Any(e => e.Id == id);
+        }
+
+        private string BuildMqttTopic(string baseTopic, string subTopic)
+        {
+            var sb = new StringBuilder();
+            if (!string.IsNullOrWhiteSpace(baseTopic))
+            {
+                sb.Append(baseTopic);
+                if (!baseTopic.EndsWith('/'))
+                {
+                    sb.Append('/');
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(subTopic))
+            {
+                sb.Append(subTopic);
+                //if (!subTopic.EndsWith('/'))
+                //{
+                //    sb.Append('/');
+                //}
+            }
+            //TODO: remove before prod :D
+            else
+            {
+                sb.Append("scale-01");
+            }
+
+            return sb.ToString();
         }
     }
 }
