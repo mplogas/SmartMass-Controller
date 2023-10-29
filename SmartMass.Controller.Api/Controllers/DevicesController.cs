@@ -98,7 +98,10 @@ namespace SmartMass.Controller.Api.Controllers
 
             if (ModelState.IsValid)
             {
-                this.dbContext.Entry(device).State = EntityState.Modified;
+                var dto = new DeviceDTO();
+                dto.MapFrom(device);
+
+                this.dbContext.Entry(dto).State = EntityState.Modified;
                 try
                 {
                     await dbContext.SaveChangesAsync();
