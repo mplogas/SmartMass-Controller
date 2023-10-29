@@ -7,7 +7,18 @@ namespace SmartMass.Controller.Model.Mapping
     {
         public static void MapFrom(this DeviceDTO dto, Device pageModel)
         {
+            dto.CreateFrom(pageModel);
             dto.Id = pageModel.Id;
+            //dto.Name = pageModel.Name;
+            //dto.CalibrationFactor = pageModel.CalibrationFactor;
+            //dto.ScaleCalibrationWeight = pageModel.ScaleCalibrationWeight;
+            //dto.ScaleSamplingSize = pageModel.ScaleSamplingSize;
+            //dto.ScaleUpdateInterval = pageModel.ScaleUpdateInterval;
+            //dto.ScaleDisplayTimeout = pageModel.ScaleDisplayTimeout * 1000;
+        }
+
+        public static void CreateFrom(this DeviceDTO dto, Device pageModel)
+        {
             dto.Name = pageModel.Name;
             dto.CalibrationFactor = pageModel.CalibrationFactor;
             dto.ScaleCalibrationWeight = pageModel.ScaleCalibrationWeight;
@@ -29,5 +40,6 @@ namespace SmartMass.Controller.Model.Mapping
                 ScaleDisplayTimeout = dto.ScaleDisplayTimeout / 1000,
             };
         }
+
     }
 }

@@ -7,7 +7,7 @@ namespace SmartMass.Controller.Api.Data
     {
         public SmartMassDbContext(DbContextOptions<SmartMassDbContext> options) : base (options)
         {
-            //ConfigureDatabase();
+            ConfigureDatabase();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
