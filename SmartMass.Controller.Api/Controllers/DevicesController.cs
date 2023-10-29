@@ -32,9 +32,9 @@ public class DevicesController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public ActionResult<IEnumerable<Device>> Get()
+    public async Task<ActionResult<IEnumerable<Device>>> Get()
     {
-        if (dbContext.Devices != null) return dbContext.Devices.Select(device => device.MapTo()).ToList();
+        if (dbContext.Devices != null) return await dbContext.Devices.Select(device => device.MapTo()).ToListAsync();
 
         return Problem("no context");
     }
