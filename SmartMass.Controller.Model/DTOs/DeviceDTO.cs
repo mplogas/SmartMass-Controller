@@ -18,6 +18,8 @@
 
         public int ScaleDisplayTimeout { get; set; } = 60000; //milliseconds!
 
+        public int RfidDecay { get; set; } = 15000; //milliseconds
+
         public DateTime Created { get; set; }
 
         public DateTime Updated { get; set; }

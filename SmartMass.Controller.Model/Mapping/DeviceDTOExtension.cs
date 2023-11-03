@@ -30,6 +30,7 @@ namespace SmartMass.Controller.Model.Mapping
                 ScaleSamplingSize = dto.ScaleSamplingSize,
                 ScaleUpdateInterval = dto.ScaleUpdateInterval,
                 ScaleDisplayTimeout = dto.ScaleDisplayTimeout / 1000,
+                RfidTagDecay = dto.RfidDecay
             };
         }
 
@@ -41,6 +42,7 @@ namespace SmartMass.Controller.Model.Mapping
             dto.ScaleSamplingSize = pageModel.ScaleSamplingSize;
             dto.ScaleUpdateInterval = pageModel.ScaleUpdateInterval;
             dto.ScaleDisplayTimeout = pageModel.ScaleDisplayTimeout * 1000;
+            dto.RfidDecay = pageModel.RfidTagDecay;
         }
     }
 }

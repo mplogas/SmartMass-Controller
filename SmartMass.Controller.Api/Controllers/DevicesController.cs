@@ -168,6 +168,10 @@ public class DevicesController : ControllerBase
                 display = new
                 {
                     display_timeout = dto.ScaleDisplayTimeout
+                },
+                rfid = new
+                {
+                    decay = dto.RfidDecay
                 }
             };
 

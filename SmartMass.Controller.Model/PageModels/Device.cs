@@ -30,5 +30,9 @@ namespace SmartMass.Controller.Model.PageModels
         [Range(1, 21600, ErrorMessage = "The display timeout should be between {1} and {2} to avoid burn-in.")]
         [Display(Name = "display timeout (in s)")]
         public int ScaleDisplayTimeout { get; set; } = 60; //seconds!
+
+        [Range(1, 21600, ErrorMessage = "The rfid tag decay should be between {1} and {2}.")]
+        [Display(Name = "RFID tag decay (in s)")]
+        public int RfidTagDecay { get; set; } = 15; //seconds!
     }
 }
