@@ -3,6 +3,7 @@ using MQTTnet;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Api.Services;
 using System.Reflection;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace SmartMass.Controller.Api
 {
@@ -42,14 +43,17 @@ namespace SmartMass.Controller.Api
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseWebAssemblyDebugging();
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
 
+            app.UseBlazorFrameworkFiles();
+            app.UseStaticFiles();
 
             app.MapControllers();
+            app.MapFallbackToFile("index.html");
 
             app.Run();
         }
