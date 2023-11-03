@@ -171,7 +171,7 @@ public class DevicesController : ControllerBase
                 }
             };
 
-            mqttClient.Publish(BuildMqttTopic(mqttTopicBase, dto.ClientId), JsonConvert.SerializeObject(dynObj));
+            mqttClient.Publish(Helper.BuildMqttTopic(mqttTopicBase, "command", dto.ClientId), JsonConvert.SerializeObject(dynObj));
             return Ok();
         }
         catch (Exception e)
@@ -196,7 +196,7 @@ public class DevicesController : ControllerBase
                 action = "tare"
             };
 
-            mqttClient.Publish(BuildMqttTopic(mqttTopicBase, dto.ClientId), JsonConvert.SerializeObject(dynObj));
+            mqttClient.Publish(Helper.BuildMqttTopic(mqttTopicBase,"command", dto.ClientId), JsonConvert.SerializeObject(dynObj));
             return Ok();
         }
         catch (Exception e)
@@ -220,8 +220,8 @@ public class DevicesController : ControllerBase
             {
                 action = "calibrate"
             };
-
-            mqttClient.Publish(BuildMqttTopic(mqttTopicBase, dto.ClientId), Convert.ToString(dynObj));
+            
+            mqttClient.Publish(Helper.BuildMqttTopic(mqttTopicBase, "command", dto.ClientId), Convert.ToString(dynObj));
             return Ok();
         }
         catch (Exception e)
@@ -235,32 +235,5 @@ public class DevicesController : ControllerBase
         return dbContext.Devices.Any(e => e.Id == id);
     }
 
-    private string BuildMqttTopic(string baseTopic, string action, string clientId)
-    {
-        var sb = new StringBuilder();
-        if (!string.IsNullOrWhiteSpace(baseTopic))
-        {
-            sb.Append(baseTopic);
-            if (!baseTopic.EndsWith('/')) sb.Append('/');
-        }
-        
-        if (!string.IsNullOrWhiteSpace(action))
-        {
-            sb.Append(action);
-            if (!action.EndsWith('/'))
-            {
-                sb.Append('/');
-            }
 
-            if (!string.IsNullOrWhiteSpace(clientId))
-            {
-                sb.Append(clientId);
-            }
-            //TODO: remove before prod :D
-            else
-                sb.Append("scale-01");
-        } 
-
-        return sb.ToString();
-    }
 }

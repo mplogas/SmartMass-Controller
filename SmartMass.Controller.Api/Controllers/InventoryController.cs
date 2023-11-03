@@ -188,7 +188,7 @@ namespace SmartMass.Controller.Api.Controllers
                     }
                 };
 
-                mqttClient.Publish(BuildMqttTopic(mqttTopicBase, dev.ClientId), JsonConvert.SerializeObject(dynObj));
+                mqttClient.Publish(Helper.BuildMqttTopic(mqttTopicBase, "command", dev.ClientId), JsonConvert.SerializeObject(dynObj));
                 return Ok();
             }
             catch (Exception e)
@@ -201,29 +201,6 @@ namespace SmartMass.Controller.Api.Controllers
         private bool SpoolExists(Guid id)
         {
             return dbContext.Spools.Any(e => e.Id == id);
-        }
-
-        //TODO: remove code duplication
-        private string BuildMqttTopic(string baseTopic, string subTopic)
-        {
-            var sb = new StringBuilder();
-            if (!string.IsNullOrWhiteSpace(baseTopic))
-            {
-                sb.Append(baseTopic);
-                if (!baseTopic.EndsWith('/')) sb.Append('/');
-            }
-
-            if (!string.IsNullOrWhiteSpace(subTopic))
-                sb.Append(subTopic);
-            //if (!subTopic.EndsWith('/'))
-            //{
-            //    sb.Append('/');
-            //}
-            //TODO: remove before prod :D
-            else
-                sb.Append("scale-01");
-
-            return sb.ToString();
         }
     }
 }
