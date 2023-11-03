@@ -21,17 +21,17 @@ namespace SmartMass.Controller.Api.Services
             this.mqttClient.OnClientDisconnected += OnClientDisconnected;
             this.mqttClient.OnClientConnected += OnClientConnected;
         }
-        public async Task Listen(string topic)
-        {
-        }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await this.mqttClient.Connect(this.mqttConfig.GetValue<string>("host"), this.mqttConfig.GetValue<string>("clientid"),
                 this.mqttConfig.GetValue<string>("user"), this.mqttConfig.GetValue<string>("password"));
             this.logger.LogInformation("Connected");
-            await mqttClient.Subscribe($"{this.mqttConfig.GetValue<string>("topic")}/#");
-            this.logger.LogInformation("subscribed");
+
+            await mqttClient.Subscribe($"{this.mqttConfig.GetValue<string>("topic")}/status/#");
+            await mqttClient.Subscribe($"{this.mqttConfig.GetValue<string>("topic")}/response/#");
+            await mqttClient.Subscribe($"{this.mqttConfig.GetValue<string>("topic")}/heartbeat/#");
+            this.logger.LogInformation("subscribed to all topics");
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

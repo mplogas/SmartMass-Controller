@@ -235,7 +235,7 @@ public class DevicesController : ControllerBase
         return dbContext.Devices.Any(e => e.Id == id);
     }
 
-    private string BuildMqttTopic(string baseTopic, string subTopic)
+    private string BuildMqttTopic(string baseTopic, string action, string clientId)
     {
         var sb = new StringBuilder();
         if (!string.IsNullOrWhiteSpace(baseTopic))
@@ -243,16 +243,23 @@ public class DevicesController : ControllerBase
             sb.Append(baseTopic);
             if (!baseTopic.EndsWith('/')) sb.Append('/');
         }
+        
+        if (!string.IsNullOrWhiteSpace(action))
+        {
+            sb.Append(action);
+            if (!action.EndsWith('/'))
+            {
+                sb.Append('/');
+            }
 
-        if (!string.IsNullOrWhiteSpace(subTopic))
-            sb.Append(subTopic);
-        //if (!subTopic.EndsWith('/'))
-        //{
-        //    sb.Append('/');
-        //}
-        //TODO: remove before prod :D
-        else
-            sb.Append("scale-01");
+            if (!string.IsNullOrWhiteSpace(clientId))
+            {
+                sb.Append(clientId);
+            }
+            //TODO: remove before prod :D
+            else
+                sb.Append("scale-01");
+        } 
 
         return sb.ToString();
     }
