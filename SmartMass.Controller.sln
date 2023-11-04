@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartMass.Controller.Mqtt", "SmartMass.Controller.MQTT\SmartMass.Controller.Mqtt.csproj", "{A6CC341D-0763-4977-B624-170C5281C971}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartMass.Controller.Model", "SmartMass.Controller.Model\SmartMass.Controller.Model.csproj", "{54810748-3960-4771-8D3D-7D3C3B208A5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartMass.Controller.Shared", "SmartMass.Controller.Shared\SmartMass.Controller.Shared.csproj", "{54810748-3960-4771-8D3D-7D3C3B208A5D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartMass.Controller.Api", "SmartMass.Controller.Api\SmartMass.Controller.Api.csproj", "{242F5DE3-1F1D-45A8-B181-9F502DD85BE8}"
 EndProject

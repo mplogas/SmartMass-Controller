@@ -15,9 +15,7 @@
 
 @code {
     private HubConnection? hubConnection;
-    private List<string> messages = new List<string>();
-    private string? userInput;
-    private string? messageInput;
+    private readonly List<string> messages = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {

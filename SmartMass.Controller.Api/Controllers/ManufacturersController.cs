@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Api.Models.DTOs;
 using SmartMass.Controller.Api.Models.Mapping;
-using SmartMass.Controller.Model.PageModels;
+using SmartMass.Controller.Shared.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

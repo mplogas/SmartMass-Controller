@@ -1,5 +1,5 @@
 ﻿using SmartMass.Controller.Api.Models.DTOs;
-using SmartMass.Controller.Model.PageModels;
+using SmartMass.Controller.Shared.Models;
 
 namespace SmartMass.Controller.Api.Models.Mapping
 {

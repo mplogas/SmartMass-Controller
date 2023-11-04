@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SmartMass.Controller.Model.PageModels
+namespace SmartMass.Controller.Shared.Models
 {
     public class Material
     { public int Id { get; set; }

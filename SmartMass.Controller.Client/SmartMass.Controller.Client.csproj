@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmartMass.Controller.Model\SmartMass.Controller.Model.csproj" />
+    <ProjectReference Include="..\SmartMass.Controller.Shared\SmartMass.Controller.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Api.Models.DTOs;
 using SmartMass.Controller.Api.Models.Mapping;
-using SmartMass.Controller.Model.PageModels;
+using SmartMass.Controller.Shared.Models;
 
 namespace SmartMass.Controller.Api.Controllers
 {
