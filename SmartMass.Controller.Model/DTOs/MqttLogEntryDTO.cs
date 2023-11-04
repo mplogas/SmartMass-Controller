@@ -8,16 +8,15 @@ namespace SmartMass.Controller.Model.DTOs
 {
     public class MqttLogEntryDTO
     {
-        public MqttLogEntryDTO(long id, Guid spoolId, long value, DateTime received)
+        public MqttLogEntryDTO(Guid spoolId, long value, DateTime received)
         {
-            Id = id;
             SpoolId = spoolId;
             Value = value;
             Received = received;
         }
-        public long Id { get; private set; }
-        public Guid SpoolId { get; private set; }
-        public long Value { get; private set; }
-        public DateTime Received { get; private set; }
+        public long Id { get; set; }
+        public Guid SpoolId { get; set; }
+        public long Value { get; set; }
+        public DateTime Received { get; set; }
     }
 }

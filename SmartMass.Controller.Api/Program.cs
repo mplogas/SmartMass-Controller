@@ -3,6 +3,8 @@ using MQTTnet;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Api.Services;
 using System.Reflection;
+using Microsoft.AspNetCore.ResponseCompression;
+using SmartMass.Controller.Api.Hubs;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace SmartMass.Controller.Api
@@ -36,7 +38,16 @@ namespace SmartMass.Controller.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddSignalR();
+            builder.Services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
+
             var app = builder.Build();
+
+            app.UseResponseCompression();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -53,6 +64,7 @@ namespace SmartMass.Controller.Api
             app.UseStaticFiles();
 
             app.MapControllers();
+            app.MapHub<MessageHub>("/messages");
             app.MapFallbackToFile("index.html");
 
             app.Run();
