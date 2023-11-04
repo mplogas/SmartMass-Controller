@@ -32,7 +32,7 @@
             StateHasChanged();
         });
 
-        hubConnection.On<string, int, Guid>("Status", (deviceId, value, spoolId) =>
+        hubConnection.On<string, int, Guid>("KnownStatus", (deviceId, value, spoolId) =>
         {
             var encodedMsg = $"status - {deviceId}: {value}g ({spoolId})";
             messages.Add(encodedMsg);

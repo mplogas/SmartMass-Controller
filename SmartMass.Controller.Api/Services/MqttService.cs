@@ -70,16 +70,16 @@ namespace SmartMass.Controller.Api.Services
 
             if (e.Topic.StartsWith(this.statusTopic))
             {
-                var definition = new { device_id = string.Empty, value = 0, spoolId = Guid.Empty };
+                var definition = new { device_id = string.Empty, value = 0, spool_id = string.Empty };
                 var payload = JsonConvert.DeserializeAnonymousType(e.Payload, definition);
                 if(!string.IsNullOrWhiteSpace(payload.device_id)) {
-                    if (payload.spoolId != Guid.Empty)
+                    if(Guid.TryParse(payload.spool_id, out var spoolId)) 
                     {
                         var scopedDbContext = scope.ServiceProvider.GetRequiredService<SmartMassDbContext>();
-                        var entry = new MqttLogEntryDTO(payload.spoolId, payload.value, DateTime.UtcNow);
+                        var entry = new MqttLogEntryDTO(spoolId, payload.value, DateTime.UtcNow);
                         scopedDbContext.MqttValues.Add(entry);
                         await scopedDbContext.SaveChangesAsync();
-                        await scopedHub.Clients.All.SendAsync("Status", payload.device_id, payload.value, payload.spoolId);
+                        await scopedHub.Clients.All.SendAsync("KnownStatus", payload.device_id, payload.value, spoolId);
                     }
                     else
                     {
