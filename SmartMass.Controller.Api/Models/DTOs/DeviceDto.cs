@@ -1,6 +1,6 @@
-﻿namespace SmartMass.Controller.Model.DTOs
+﻿namespace SmartMass.Controller.Api.Models.DTOs
 {
-    public class DeviceDTO
+    public class DeviceDto
     {
         public int Id { get; set; }
 

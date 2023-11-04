@@ -1,25 +1,25 @@
-﻿using SmartMass.Controller.Model.DTOs;
+﻿using SmartMass.Controller.Api.Models.DTOs;
 using SmartMass.Controller.Model.PageModels;
 
-namespace SmartMass.Controller.Model.Mapping
+namespace SmartMass.Controller.Api.Models.Mapping
 {
     public static class DeviceDtoExtension
     {
-        public static void MapFrom(this DeviceDTO dto, Device pageModel)
+        public static void MapFrom(this DeviceDto dto, Device pageModel)
         {
             dto.Map(pageModel);
             dto.Id = pageModel.Id;
             dto.Updated = DateTime.UtcNow;
         }
 
-        public static void CreateFrom(this DeviceDTO dto, Device pageModel)
+        public static void CreateFrom(this DeviceDto dto, Device pageModel)
         {
             dto.Map(pageModel);
             dto.Created = DateTime.UtcNow;
             dto.Updated = DateTime.UtcNow;
         }
 
-        public static Device MapTo(this DeviceDTO dto)
+        public static Device MapTo(this DeviceDto dto)
         {
             return new Device()
             {
@@ -34,7 +34,7 @@ namespace SmartMass.Controller.Model.Mapping
             };
         }
 
-        private static void Map(this DeviceDTO dto, Device pageModel)
+        private static void Map(this DeviceDto dto, Device pageModel)
         {
             dto.Name = pageModel.Name;
             dto.CalibrationFactor = pageModel.CalibrationFactor;

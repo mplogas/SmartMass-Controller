@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SmartMass.Controller.Model.DTOs;
+using SmartMass.Controller.Api.Models.DTOs;
 
 namespace SmartMass.Controller.Api.Data
 {
@@ -28,46 +28,46 @@ namespace SmartMass.Controller.Api.Data
 #endif
         }
 
-        public DbSet<ManufacturerDTO> Manufacturers { get; set; }
-        public DbSet<MaterialDTO> Materials { get; set; }
-        public DbSet<SpoolDTO> Spools { get; set; }
-        public DbSet<DeviceDTO> Devices { get; set; }
-        public DbSet<MqttLogEntryDTO> MqttValues { get; set; }
+        public DbSet<ManufacturerDto> Manufacturers { get; set; }
+        public DbSet<MaterialDto> Materials { get; set; }
+        public DbSet<SpoolDto> Spools { get; set; }
+        public DbSet<DeviceDto> Devices { get; set; }
+        public DbSet<MqttLogEntryDto> MqttValues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ManufacturerDTO>().HasKey(k => k.Id);
-            modelBuilder.Entity<ManufacturerDTO>().Property(p => p.Name).IsRequired();
+            modelBuilder.Entity<ManufacturerDto>().HasKey(k => k.Id);
+            modelBuilder.Entity<ManufacturerDto>().Property(p => p.Name).IsRequired();
 
-            modelBuilder.Entity<MaterialDTO>().HasKey(k => k.Id);
-            modelBuilder.Entity<MaterialDTO>().Property(p => p.Type).IsRequired();
-            modelBuilder.Entity<MaterialDTO>().Property(p => p.DefaultBedTemp).HasDefaultValue(0);
-            modelBuilder.Entity<MaterialDTO>().Property(p => p.DefaultNozzleTemp).HasDefaultValue(0);
+            modelBuilder.Entity<MaterialDto>().HasKey(k => k.Id);
+            modelBuilder.Entity<MaterialDto>().Property(p => p.Type).IsRequired();
+            modelBuilder.Entity<MaterialDto>().Property(p => p.DefaultBedTemp).HasDefaultValue(0);
+            modelBuilder.Entity<MaterialDto>().Property(p => p.DefaultNozzleTemp).HasDefaultValue(0);
 
-            modelBuilder.Entity<SpoolDTO>().HasKey(k => k.Id);
-            modelBuilder.Entity<SpoolDTO>().Property(p => p.Name).IsRequired();
-            modelBuilder.Entity<SpoolDTO>().Property(p => p.EmptySpoolWeight).HasDefaultValue(0);
-            modelBuilder.Entity<SpoolDTO>().Property(p => p.NozzleTemp).HasDefaultValue(0);
-            modelBuilder.Entity<SpoolDTO>().Property(p => p.BedTemp).HasDefaultValue(0);
-            modelBuilder.Entity<SpoolDTO>().Property(p => p.Color).IsRequired();
-            modelBuilder.Entity<SpoolDTO>().HasOne(s => s.ManufacturerDto).WithMany(s => s.Spools)
+            modelBuilder.Entity<SpoolDto>().HasKey(k => k.Id);
+            modelBuilder.Entity<SpoolDto>().Property(p => p.Name).IsRequired();
+            modelBuilder.Entity<SpoolDto>().Property(p => p.EmptySpoolWeight).HasDefaultValue(0);
+            modelBuilder.Entity<SpoolDto>().Property(p => p.NozzleTemp).HasDefaultValue(0);
+            modelBuilder.Entity<SpoolDto>().Property(p => p.BedTemp).HasDefaultValue(0);
+            modelBuilder.Entity<SpoolDto>().Property(p => p.Color).IsRequired();
+            modelBuilder.Entity<SpoolDto>().HasOne(s => s.ManufacturerDto).WithMany(s => s.Spools)
                 .HasForeignKey(s => s.ManufacturerId).IsRequired();
-            modelBuilder.Entity<SpoolDTO>().HasOne(s => s.MaterialDto).WithMany(s => s.Spools)
+            modelBuilder.Entity<SpoolDto>().HasOne(s => s.MaterialDto).WithMany(s => s.Spools)
                 .HasForeignKey(s => s.MaterialId).IsRequired();
-            modelBuilder.Entity<SpoolDTO>().Property(p => p.Created).HasDefaultValue(DateTime.UtcNow);
+            modelBuilder.Entity<SpoolDto>().Property(p => p.Created).HasDefaultValue(DateTime.UtcNow);
 
-            modelBuilder.Entity<DeviceDTO>().HasKey(k => k.Id);
-            modelBuilder.Entity<DeviceDTO>().Property(p => p.Name).IsRequired();
-            modelBuilder.Entity<DeviceDTO>().Property(p => p.CalibrationFactor).HasDefaultValue(981).IsRequired();
-            modelBuilder.Entity<DeviceDTO>().Property(p => p.ScaleUpdateInterval).HasDefaultValue(1000).IsRequired();
-            modelBuilder.Entity<DeviceDTO>().Property(p => p.ScaleSamplingSize).HasDefaultValue(1).IsRequired();
-            modelBuilder.Entity<DeviceDTO>().Property(p => p.ScaleCalibrationWeight).HasDefaultValue(100).IsRequired();
-            modelBuilder.Entity<DeviceDTO>().Property(p => p.ScaleDisplayTimeout).HasDefaultValue(60000).IsRequired();
+            modelBuilder.Entity<DeviceDto>().HasKey(k => k.Id);
+            modelBuilder.Entity<DeviceDto>().Property(p => p.Name).IsRequired();
+            modelBuilder.Entity<DeviceDto>().Property(p => p.CalibrationFactor).HasDefaultValue(981).IsRequired();
+            modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleUpdateInterval).HasDefaultValue(1000).IsRequired();
+            modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleSamplingSize).HasDefaultValue(1).IsRequired();
+            modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleCalibrationWeight).HasDefaultValue(100).IsRequired();
+            modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleDisplayTimeout).HasDefaultValue(60000).IsRequired();
 
-            modelBuilder.Entity<MqttLogEntryDTO>().HasKey(k => k.Id);
-            modelBuilder.Entity<MqttLogEntryDTO>().Property(p => p.SpoolId).IsRequired();
-            modelBuilder.Entity<MqttLogEntryDTO>().Property(p => p.Value).IsRequired();
-            modelBuilder.Entity<MqttLogEntryDTO>().Property(p => p.Received).IsRequired();
+            modelBuilder.Entity<MqttLogEntryDto>().HasKey(k => k.Id);
+            modelBuilder.Entity<MqttLogEntryDto>().Property(p => p.SpoolId).IsRequired();
+            modelBuilder.Entity<MqttLogEntryDto>().Property(p => p.Value).IsRequired();
+            modelBuilder.Entity<MqttLogEntryDto>().Property(p => p.Received).IsRequired();
         }
     }
 }

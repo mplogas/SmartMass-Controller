@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SmartMass.Controller.Model.DTOs
+﻿namespace SmartMass.Controller.Api.Models.DTOs
 {
-    public class MaterialDTO
+    public class MaterialDto
     {
 
         public int Id { get; set; }
@@ -18,7 +11,7 @@ namespace SmartMass.Controller.Model.DTOs
 
         public int DefaultBedTemp { get; set; } = 0;
 
-        public List<SpoolDTO> Spools { get; set; } = new();
+        public List<SpoolDto> Spools { get; set; } = new();
 
         public DateTime Created { get; set; }
 

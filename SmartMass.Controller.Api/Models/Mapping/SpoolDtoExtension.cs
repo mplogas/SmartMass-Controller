@@ -1,16 +1,11 @@
-﻿using SmartMass.Controller.Model.DTOs;
+﻿using SmartMass.Controller.Api.Models.DTOs;
 using SmartMass.Controller.Model.PageModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SmartMass.Controller.Model.Mapping
+namespace SmartMass.Controller.Api.Models.Mapping
 {
     public static class SpoolDtoExtension
     {
-        public static void CreateFrom(this SpoolDTO dto, Spool pageModel)
+        public static void CreateFrom(this SpoolDto dto, Spool pageModel)
         {
             dto.Map(pageModel);
             dto.Id = Guid.NewGuid();
@@ -18,14 +13,14 @@ namespace SmartMass.Controller.Model.Mapping
             dto.Updated = DateTime.UtcNow;
         }
 
-        public static void MapFrom(this SpoolDTO dto, Spool pageModel)
+        public static void MapFrom(this SpoolDto dto, Spool pageModel)
         {
             dto.Map(pageModel);
             dto.Id = pageModel.Id;
             dto.Updated = DateTime.UtcNow;
         }
 
-        public static Spool MapTo(this SpoolDTO dto)
+        public static Spool MapTo(this SpoolDto dto)
         {
             return new Spool()
             {
@@ -43,7 +38,7 @@ namespace SmartMass.Controller.Model.Mapping
             };
         }
 
-        private static void Map(this SpoolDTO dto, Spool pageModel)
+        private static void Map(this SpoolDto dto, Spool pageModel)
         {
             dto.Name = pageModel.Name;
             dto.Color = pageModel.Color;

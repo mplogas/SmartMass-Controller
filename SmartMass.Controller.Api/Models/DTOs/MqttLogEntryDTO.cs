@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SmartMass.Controller.Model.DTOs
+﻿namespace SmartMass.Controller.Api.Models.DTOs
 {
-    public class MqttLogEntryDTO
+    public class MqttLogEntryDto
     {
-        public MqttLogEntryDTO(Guid spoolId, long value, DateTime received)
+        public MqttLogEntryDto(Guid spoolId, long value, DateTime received)
         {
             SpoolId = spoolId;
             Value = value;

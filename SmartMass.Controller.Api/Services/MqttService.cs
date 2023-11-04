@@ -2,8 +2,7 @@
 using Newtonsoft.Json;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Api.Hubs;
-using SmartMass.Controller.Model.DTOs;
-using SmartMass.Controller.Model.PageModels;
+using SmartMass.Controller.Api.Models.DTOs;
 using SmartMass.Controller.Mqtt;
 
 namespace SmartMass.Controller.Api.Services
@@ -76,7 +75,7 @@ namespace SmartMass.Controller.Api.Services
                     if(Guid.TryParse(payload.spool_id, out var spoolId)) 
                     {
                         var scopedDbContext = scope.ServiceProvider.GetRequiredService<SmartMassDbContext>();
-                        var entry = new MqttLogEntryDTO(spoolId, payload.value, DateTime.UtcNow);
+                        var entry = new MqttLogEntryDto(spoolId, payload.value, DateTime.UtcNow);
                         scopedDbContext.MqttValues.Add(entry);
                         await scopedDbContext.SaveChangesAsync();
                         await scopedHub.Clients.All.SendAsync("KnownStatus", payload.device_id, payload.value, spoolId);

@@ -2,11 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SmartMass.Controller.Api.Data;
-using SmartMass.Controller.Model.DTOs;
-using SmartMass.Controller.Model.Mapping;
+using SmartMass.Controller.Api.Models.DTOs;
+using SmartMass.Controller.Api.Models.Mapping;
 using SmartMass.Controller.Model.PageModels;
 using SmartMass.Controller.Mqtt;
-using System.Text;
 
 namespace SmartMass.Controller.Api.Controllers
 {
@@ -71,7 +70,7 @@ namespace SmartMass.Controller.Api.Controllers
 
                 if (manufacturerDto != null && materialDto != null)
                 {
-                    var dto = new SpoolDTO();
+                    var dto = new SpoolDto();
                     dto.CreateFrom(spool);
                     dto.ManufacturerDto = manufacturerDto;
                     dto.MaterialDto = materialDto;
@@ -110,7 +109,7 @@ namespace SmartMass.Controller.Api.Controllers
 
             if (ModelState.IsValid)
             {
-                var dto = new SpoolDTO();
+                var dto = new SpoolDto();
                 dto.MapFrom(spool);
 
                 dbContext.Entry(dto).State = EntityState.Modified;

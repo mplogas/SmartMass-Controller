@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartMass.Controller.Api.Data;
-using SmartMass.Controller.Model.DTOs;
-using SmartMass.Controller.Model.Mapping;
+using SmartMass.Controller.Api.Models.DTOs;
+using SmartMass.Controller.Api.Models.Mapping;
 using SmartMass.Controller.Model.PageModels;
 
 namespace SmartMass.Controller.Api.Controllers
@@ -59,7 +58,7 @@ namespace SmartMass.Controller.Api.Controllers
         {
             if (ModelState.IsValid)
             {
-                var dto = new MaterialDTO();
+                var dto = new MaterialDto();
                 dto.CreateFrom(material);
                 dbContext.Add(dto);
                 try
@@ -90,7 +89,7 @@ namespace SmartMass.Controller.Api.Controllers
 
             if (ModelState.IsValid)
             {
-                var dto = new MaterialDTO();
+                var dto = new MaterialDto();
                 dto.MapFrom(material);
 
                 dbContext.Entry(dto).State = EntityState.Modified;

@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SmartMass.Controller.Model.DTOs
+namespace SmartMass.Controller.Api.Models.DTOs
 {
-    public class SpoolDTO
+    public class SpoolDto
     {
         [Key]
         public Guid Id { get; set; }
@@ -13,10 +12,10 @@ namespace SmartMass.Controller.Model.DTOs
         public int EmptySpoolWeight { get; set; } = 0;
 
         public int ManufacturerId { get; set; }
-        public ManufacturerDTO ManufacturerDto { get; set; } = new();
+        public ManufacturerDto ManufacturerDto { get; set; } = new();
 
         public int MaterialId { get; set; }
-        public MaterialDTO MaterialDto { get; set; } = new();
+        public MaterialDto MaterialDto { get; set; } = new();
 
         public string Color { get; set; } = "#000000";
 

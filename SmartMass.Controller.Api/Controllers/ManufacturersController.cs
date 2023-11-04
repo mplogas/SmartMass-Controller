@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartMass.Controller.Api.Data;
-using SmartMass.Controller.Model.DTOs;
-using SmartMass.Controller.Model.Mapping;
+using SmartMass.Controller.Api.Models.DTOs;
+using SmartMass.Controller.Api.Models.Mapping;
 using SmartMass.Controller.Model.PageModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -60,7 +60,7 @@ public class ManufacturersController : ControllerBase
     {
         if (ModelState.IsValid)
         {
-            var dto = new ManufacturerDTO();
+            var dto = new ManufacturerDto();
             dto.CreateFrom(manufacturer);
             dbContext.Add(dto);
             try
@@ -91,7 +91,7 @@ public class ManufacturersController : ControllerBase
 
         if (ModelState.IsValid)
         {
-            var dto = new ManufacturerDTO();
+            var dto = new ManufacturerDto();
             dto.MapFrom(manufacturer);
 
             dbContext.Entry(dto).State = EntityState.Modified;
