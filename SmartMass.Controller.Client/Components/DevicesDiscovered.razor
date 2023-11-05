@@ -6,7 +6,7 @@
             <MudItem xs="12">
                 <MudText Align="Align.Start" Typo="Typo.subtitle1">Select discovered device</MudText>
             </MudItem>
-            @if (Loading)
+            @if (loading)
             {
                 <MudItem xs="12">
                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
@@ -30,7 +30,7 @@
                     <MudItem xs="12">
                         <MudPaper Class="d-flex align-center pa-2 mx-2 my-2">
                             <MudText Typo="Typo.body1" Class="mr-4">No device discovered</MudText>
-                            <MudButton Disabled="@Loading" Size="Size.Small" OnClick="LoadData" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Reload</MudButton>
+                            <MudButton Disabled="@loading" Size="Size.Small" OnClick="LoadData" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Reload</MudButton>
                         </MudPaper>
                     </MudItem>
                 }
@@ -64,7 +64,7 @@
     bool success;
     string[] errors = { };
 
-    private bool Loading = false;
+    private bool loading = false;
     MudForm form;
     MudTextField<string> input;
 
@@ -89,10 +89,14 @@
 
     private async Task OpenDeviceEditDialog(string deviceId)
     {
-        var parameters = new DialogParameters<DeviceEdit> { { d => d.Device, deviceId } };
+        var parameters = new DialogParameters<DeviceEdit>
+        {
+            { p => p.Device, deviceId },
+            { p => p.IsNew, true }
+        };
 
         var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true};
-        var dialog = await DialogService.ShowAsync<DeviceEdit>("Second Level Dialog", parameters, options);
+        var dialog = await DialogService.ShowAsync<DeviceEdit>("Configure new device", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
@@ -103,7 +107,7 @@
 
     private async Task LoadData()
     {
-        Loading = true;
+        loading = true;
         var response = await HttpClient.GetAsync("api/Devices/discovered");
         var result = await response.Content.ReadFromJsonAsync<IEnumerable<string>>();
         if (result != null)
@@ -112,6 +116,6 @@
             DiscoveredDevices.AddRange(result);
             StateHasChanged();
         }
-        Loading = false;
+        loading = false;
     }
 }

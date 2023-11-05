@@ -20,7 +20,7 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public string Device { get; set; } = string.Empty;
-
+    [Parameter] public bool IsNew { get; set; }
     [Inject] HttpClient HttpClient { get; set; }
 
     protected override async Task OnInitializedAsync()

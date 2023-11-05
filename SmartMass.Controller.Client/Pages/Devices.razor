@@ -1,5 +1,7 @@
 ﻿@page "/devices"
 @using Microsoft.AspNetCore.SignalR.Client
+@using SmartMass.Controller.Client.Components
+@using SmartMass.Controller.Shared.Models
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
 @inject IDialogService DialogService
@@ -21,6 +23,10 @@
 
 
 @code {
+    [Inject] HttpClient HttpClient { get; set; }
+    private bool loading = false;
+    private List<Device> devices = new List<Device>();
+
     private HubConnection? hubConnection;
     private readonly Dictionary<string, int> status = new Dictionary<string, int>();
 
@@ -43,6 +49,8 @@
         });
 
         await hubConnection.StartAsync();
+
+        await LoadData();
     }
 
     public bool IsConnected =>
@@ -56,15 +64,47 @@
         }
     }
 
-    private void AddDevice()
+    private async Task AddDevice()
     {
         var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, ClassBackground = "dialog-blurred-bg" };
-        DialogService.Show<Components.DevicesDiscovered>("Add new device", options);
+        var dialog = await DialogService.ShowAsync<Components.DevicesDiscovered>("Add new device", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
     }
 
-    private void EditDevice(string deviceId)
+    private async Task EditDevice(string deviceId)
     {
-        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true, ClassBackground = "dialog-blurred-bg" };
-        DialogService.Show<Components.DevicesDiscovered>($"Edit {deviceId}", options);
+        var parameters = new DialogParameters<DeviceEdit>
+        {
+            { p => p.Device, deviceId },
+            { p => p.IsNew, false }
+        };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true};
+        var dialog = await DialogService.ShowAsync<DeviceEdit>("Configure device", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        loading = true;
+        var response = await HttpClient.GetAsync("api/Devices");
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<Device>>();
+        if (result != null)
+        {
+            devices.Clear();
+            devices.AddRange(result);
+            StateHasChanged();
+        }
+        loading = false;
     }
 }
