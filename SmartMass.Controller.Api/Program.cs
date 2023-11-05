@@ -5,6 +5,7 @@ using SmartMass.Controller.Api.Services;
 using System.Reflection;
 using Microsoft.AspNetCore.ResponseCompression;
 using SmartMass.Controller.Api.Hubs;
+using SmartMass.Controller.Api.Models.Queue;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace SmartMass.Controller.Api
@@ -31,7 +32,9 @@ namespace SmartMass.Controller.Api
             builder.Services.AddTransient<MqttFactory>();
             builder.Services.AddSingleton<Mqtt.IMqttClient, Mqtt.MqttClient>();
 
+            builder.Services.AddSingleton<IDiscoveredDevices, DiscoveredDevices>();
             builder.Services.AddHostedService<MqttService>();
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

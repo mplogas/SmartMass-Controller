@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Api.Hubs;
 using SmartMass.Controller.Api.Models.DTOs;
+using SmartMass.Controller.Api.Models.Queue;
 using SmartMass.Controller.Mqtt;
 
 namespace SmartMass.Controller.Api.Services
@@ -92,9 +94,21 @@ namespace SmartMass.Controller.Api.Services
                 var payload = JsonConvert.DeserializeAnonymousType(e.Payload, definition);
                 if (!string.IsNullOrWhiteSpace(payload.device_id))
                 {
+                    var scopedDbContext = scope.ServiceProvider.GetRequiredService<SmartMassDbContext>();
+                    var discoveredDevices = scope.ServiceProvider.GetRequiredService<IDiscoveredDevices>();
+
+                    if (!discoveredDevices.Contains(payload.device_id) && 
+                        !scopedDbContext.Devices.Any(d => d.ClientId == payload.device_id))
+                    {
+                        discoveredDevices.Add(payload.device_id);
+                    } else if (discoveredDevices.Contains(payload.device_id) &&
+                               scopedDbContext.Devices.Any(d => d.ClientId == payload.device_id))
+                    {
+                        discoveredDevices.Remove(payload.device_id);
+                    }
+
                     await scopedHub.Clients.All.SendAsync("Heartbeat", payload.device_id, payload.status);
                 }
-
             }
             else if (e.Topic.StartsWith(this.responseTopic))
             {
@@ -102,17 +116,13 @@ namespace SmartMass.Controller.Api.Services
                 var payload = JsonConvert.DeserializeAnonymousType(e.Payload, definition);
                 if (!string.IsNullOrWhiteSpace(payload.device_id))
                 {
-                    await scopedHub.Clients.All.SendAsync("Heartbeat", payload.device_id, payload.result);
+                    await scopedHub.Clients.All.SendAsync("Response", payload.device_id, payload.result);
                 }
             }
             else
             {
-
                 this.logger.LogWarning($"message received from {e.ClientId} on topic {e.Topic}. Payload: {e.Payload}");
             }
-
-            //this, or DBContextFactory (https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/#using-a-dbcontext-factory-eg-for-blazor)
-            //hopefully this works better, but might run into concurrency issues
 
         }
 

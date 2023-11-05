@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Api.Models.DTOs;
 using SmartMass.Controller.Api.Models.Mapping;
+using SmartMass.Controller.Api.Models.Queue;
+using SmartMass.Controller.Api.Services;
 using SmartMass.Controller.Mqtt;
 using SmartMass.Controller.Shared.Models;
 
@@ -17,14 +19,16 @@ public class DevicesController : ControllerBase
     private readonly ILogger<DevicesController> logger;
     private readonly IMqttClient mqttClient;
     private readonly string mqttTopicBase = string.Empty;
+    private readonly IDiscoveredDevices discoveredDevices;
 
     public DevicesController(ILogger<DevicesController> logger, IConfiguration config, SmartMassDbContext dbContext,
-        IMqttClient mqttClient)
+        IMqttClient mqttClient, IDiscoveredDevices discoveredDevices)
     {
         this.logger = logger;
         this.dbContext = dbContext;
         this.mqttClient = mqttClient;
         mqttTopicBase = config.GetValue<string>("mqtt:topic");
+        this.discoveredDevices = discoveredDevices;
     }
 
     // GET: api/<DevicesController>
@@ -36,6 +40,20 @@ public class DevicesController : ControllerBase
         if (dbContext.Devices != null) return await dbContext.Devices.Select(device => device.MapTo()).ToListAsync();
 
         return Problem("no context");
+    }
+
+    // GET: api/<DevicesController>
+    [HttpGet("discovered")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public ActionResult<IEnumerable<string>> GetDiscovered()
+    {
+        if (this.discoveredDevices != null)
+        {
+            return new JsonResult(this.discoveredDevices.GetAll());
+        }
+
+        return Problem("no handle");
     }
 
     // GET api/<DevicesController>/5
