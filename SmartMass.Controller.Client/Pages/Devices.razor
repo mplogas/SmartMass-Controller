@@ -1,7 +1,70 @@
 ﻿@page "/devices"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+@inject IDialogService DialogService
 
 <h3>Devices</h3>
+<MudButton @onclick="AddDevice" Variant="Variant.Filled" Color="Color.Primary">
+    Add new Device
+</MudButton>
+<MudButton @onclick="@((e) => EditDevice("scale-01"))" Variant="Variant.Filled" Color="Color.Primary">
+    Edit Device
+</MudButton>
+
+
+<style>
+    .dialog-blurred-bg {
+        backdrop-filter: blur(10px);
+    }
+</style>
+
 
 @code {
+    private HubConnection? hubConnection;
+    private readonly Dictionary<string, int> status = new Dictionary<string, int>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/messages"))
+            .Build();
+
+        hubConnection.On<string, int>("Status", (deviceId, value) =>
+        {
+            status[deviceId] = value;
+            StateHasChanged();
+        });
+
+        hubConnection.On<string, int, Guid>("KnownStatus", (deviceId, value, spoolId) =>
+        {
+            status[deviceId] = value;
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    private void AddDevice()
+    {
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, ClassBackground = "dialog-blurred-bg" };
+        DialogService.Show<Components.DevicesDiscovered>("Add new device", options);
+    }
+
+    private void EditDevice(string deviceId)
+    {
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true, ClassBackground = "dialog-blurred-bg" };
+        DialogService.Show<Components.DevicesDiscovered>($"Edit {deviceId}", options);
+    }
 }

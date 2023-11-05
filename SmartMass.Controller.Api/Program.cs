@@ -5,7 +5,6 @@ using SmartMass.Controller.Api.Services;
 using System.Reflection;
 using Microsoft.AspNetCore.ResponseCompression;
 using SmartMass.Controller.Api.Hubs;
-using SmartMass.Controller.Api.Models.Queue;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace SmartMass.Controller.Api

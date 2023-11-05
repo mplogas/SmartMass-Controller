@@ -1,4 +1,4 @@
-﻿namespace SmartMass.Controller.Api.Models.Queue
+﻿namespace SmartMass.Controller.Api.Services
 {
     public interface IDiscoveredDevices
     {
@@ -14,12 +14,12 @@
 
         public void Add(string deviceId)
         {
-            if(!Contains(deviceId)) devices.Add(deviceId);
+            if (!Contains(deviceId)) devices.Add(deviceId);
         }
 
         public void Remove(string deviceId)
         {
-            if(Contains(deviceId)) devices.Remove(deviceId);
+            if (Contains(deviceId)) devices.Remove(deviceId);
         }
 
         public IEnumerable<string> GetAll()

@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using SmartMass.Controller.Api.Data;
 using SmartMass.Controller.Api.Models.DTOs;
 using SmartMass.Controller.Api.Models.Mapping;
-using SmartMass.Controller.Api.Models.Queue;
 using SmartMass.Controller.Api.Services;
 using SmartMass.Controller.Mqtt;
 using SmartMass.Controller.Shared.Models;

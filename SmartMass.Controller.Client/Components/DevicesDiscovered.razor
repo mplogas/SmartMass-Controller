@@ -1,0 +1,117 @@
+﻿@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid >
+            <MudItem xs="12">
+                <MudText Align="Align.Start" Typo="Typo.subtitle1">Select discovered device</MudText>
+            </MudItem>
+            @if (Loading)
+            {
+                <MudItem xs="12">
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                <MudText Class="ms-2" Typo="Typo.body1">Processing</MudText>
+                </MudItem>
+            }
+            else
+            {
+                if(DiscoveredDevices.Any()) {
+                    foreach (var item in DiscoveredDevices)
+                    {
+                        <MudItem xs="2">
+                            <MudPaper Class="d-flex align-center pa-2 mx-2 my-2">
+                                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@((e) => OpenDeviceEditDialog(item))">@item</MudButton>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                }
+                else
+                {
+                    <MudItem xs="12">
+                        <MudPaper Class="d-flex align-center pa-2 mx-2 my-2">
+                            <MudText Typo="Typo.body1" Class="mr-4">No device discovered</MudText>
+                            <MudButton Disabled="@Loading" Size="Size.Small" OnClick="LoadData" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Reload</MudButton>
+                        </MudPaper>
+                    </MudItem>
+                }
+            }
+
+            <MudItem xs="12">
+                <MudText Align="Align.Start" Typo="Typo.subtitle1">Enter Device Id manually</MudText>
+            </MudItem>
+            <MudItem xs="12">
+                <MudPaper Class="pa-4 mt-4 d-flex flex-wrap align-end">
+                    <MudItem xs="6">
+                        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                            <MudTextField @ref="input" T="string" Label="DeviceId" Required="true" RequiredError="DeviceId is required!" Class="mr-4"/>
+                        </MudForm>
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudButton Variant="Variant.Outlined" Size="Size.Medium" Color="Color.Primary" OnClick="ValidateAndOpenDeviceEdit" Class="ml-4">Next</MudButton>
+                    </MudItem>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Inject] HttpClient HttpClient { get; set; }
+    bool success;
+    string[] errors = { };
+
+    private bool Loading = false;
+    MudForm form;
+    MudTextField<string> input;
+
+    void Cancel() => MudDialog.Cancel();
+
+    private List<string> DiscoveredDevices { get; } = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadData();
+    }
+
+    private async Task ValidateAndOpenDeviceEdit()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            await OpenDeviceEditDialog(input.Value.Trim());
+        }
+    }
+
+    private async Task OpenDeviceEditDialog(string deviceId)
+    {
+        var parameters = new DialogParameters<DeviceEdit> { { d => d.Device, deviceId } };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true};
+        var dialog = await DialogService.ShowAsync<DeviceEdit>("Second Level Dialog", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            //reload discovered devices list etc
+        }
+    }
+
+    private async Task LoadData()
+    {
+        Loading = true;
+        var response = await HttpClient.GetAsync("api/Devices/discovered");
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<string>>();
+        if (result != null)
+        {
+            DiscoveredDevices.Clear();
+            DiscoveredDevices.AddRange(result);
+            StateHasChanged();
+        }
+        Loading = false;
+    }
+}
