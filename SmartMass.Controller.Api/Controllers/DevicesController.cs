@@ -41,6 +41,7 @@ public class DevicesController : ControllerBase
         return Problem("no context");
     }
 
+
     // GET: api/<DevicesController>
     [HttpGet("discovered")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -71,6 +72,29 @@ public class DevicesController : ControllerBase
         }
 
         return Problem("no context");
+    }
+
+    // GET: api/<DevicesController>/deviceid/device_id
+    [HttpGet("deviceid/{deviceId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Device>> GetByDeviceId(string deviceId)
+    {
+        if (!string.IsNullOrWhiteSpace(deviceId))
+        {
+            if (dbContext.Devices != null)
+            {
+                var device = await dbContext.Devices.FirstOrDefaultAsync(d => d.ClientId == deviceId);
+                if (device != null)
+                    return device.MapTo();
+                return NotFound();
+            }
+
+            return Problem("no context");
+        }
+        else return BadRequest();
     }
 
     // POST api/<DevicesController>
