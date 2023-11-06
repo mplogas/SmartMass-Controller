@@ -1,15 +1,37 @@
-﻿<MudDialog DisableSidePadding="true">
+﻿@using SmartMass.Controller.Shared.Models
+<MudDialog DisableSidePadding="true">
     <DialogContent>
-        <MudContainer Style="max-height: 300px; overflow-y: scroll">
-            @if (Loading)
+        <MudGrid >
+            @if (loading)
             {
-                <MudProgressCircular Indeterminate="true"></MudProgressCircular>
+                <MudItem xs="12">
+                    <MudProgressCircular Class="ms-n1" Size="Size.Large" Indeterminate="true"/>
+                    <MudText Class="ms-2" Typo="Typo.body1">Processing</MudText>
+                </MudItem>
             }
             else
             {
-                <MudText Style="white-space: pre-wrap;">@LicenseText</MudText>
+                <MudItem xs="6">
+                    <MudPaper Class="d-flex align-start pa-2 mx-2 my-2">
+                        <MudGrid>
+                            <MudItem xs="11" Class="d-flex align-center justify-center">
+                                <MudText Typo="Typo.h3">@device.Name</MudText>
+                            </MudItem>
+                            <MudItem xs="1" Class="d-flex align-start">
+                                <MudIcon Icon="@Icons.Material.Filled.Check"></MudIcon>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Class="d-flex align-end justify-end pa-2 mx-2 my-2">
+                        <MudButton Disabled="@IsNew" Size="Size.Medium" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Send Config</MudButton>
+                        <MudButton Disabled="@IsNew" Size="Size.Medium" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Calibration</MudButton>
+                    </MudPaper>
+                </MudItem>
             }
-        </MudContainer>
+            
+        </MudGrid>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
@@ -19,22 +41,51 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public string Device { get; set; } = string.Empty;
+    [Parameter] public string DeviceId { get; set; } = string.Empty;
     [Parameter] public bool IsNew { get; set; }
     [Inject] HttpClient HttpClient { get; set; }
+
+    private Device device = new Device();
+    private bool loading = false;
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.CancelAll();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Loading = true;
-        var response = await HttpClient.GetAsync("https://raw.githubusercontent.com/MudBlazor/MudBlazor/master/LICENSE");
-        LicenseText = await response.Content.ReadAsStringAsync();
-        Loading = false;
+
+        if (!IsNew)
+        {
+            if (!string.IsNullOrWhiteSpace(DeviceId)) await LoadDeviceData(DeviceId);
+        }
+        else device.Name = DeviceId;
     }
 
-    private string LicenseText;
-    private bool Loading = false;
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
-    void Cancel() => MudDialog.CancelAll();
+    private async Task LoadDeviceData(string deviceId)
+    {
+        loading = true;
+        var response = await HttpClient.GetAsync($"api/Devices/deviceid/{deviceId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Device>();
+            if (result != null)
+            {
+                device = result;
+                StateHasChanged();
+            }
+        } // TODO: ...something, something error message
+
+        loading = false;
+    }
+
+    private async Task<bool> SaveDeviceData()
+    {
+        loading = true;
+        var response = await HttpClient.PostAsJsonAsync($"api/Devices", device);
+        var result = response.IsSuccessStatusCode;
+        loading = false;
+        return result;
+    }
 }
