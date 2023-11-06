@@ -100,13 +100,14 @@ namespace SmartMass.Controller.Api.Services
                         !scopedDbContext.Devices.Any(d => d.ClientId == payload.device_id))
                     {
                         discoveredDevices.Add(payload.device_id);
-                    } else if (discoveredDevices.Contains(payload.device_id) &&
-                               scopedDbContext.Devices.Any(d => d.ClientId == payload.device_id))
+                    } else if (scopedDbContext.Devices.Any(d => d.ClientId == payload.device_id))
                     {
-                        discoveredDevices.Remove(payload.device_id);
-                    }
+                        // cleanup 
+                        if (discoveredDevices.Contains(payload.device_id)) discoveredDevices.Remove(payload.device_id);
 
-                    await scopedHub.Clients.All.SendAsync("Heartbeat", payload.device_id, payload.status);
+                        //only notify the client for registered devices
+                        await scopedHub.Clients.All.SendAsync("Heartbeat", payload.device_id, payload.status);
+                    }
                 }
             }
             else if (e.Topic.StartsWith(this.responseTopic))
