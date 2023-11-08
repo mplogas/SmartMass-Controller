@@ -1,7 +1,10 @@
 ﻿@using SmartMass.Controller.Shared.Models
-<MudDialog DisableSidePadding="true">
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IAsyncDisposable
+
+<MudDialog DisableSidePadding="false" >
     <DialogContent>
-        <MudGrid >
+        <MudGrid>
             @if (loading)
             {
                 <MudItem xs="12">
@@ -22,11 +25,70 @@
                             </MudItem>
                         </MudGrid>
                     </MudPaper>
-                </MudItem>
-                <MudItem xs="6">
-                    <MudPaper Class="d-flex align-end justify-end pa-2 mx-2 my-2">
+                    <div class="d-flex justify-end pa-2 mx-2 my-2">
                         <MudButton Disabled="@IsNew" Size="Size.Medium" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Send Config</MudButton>
                         <MudButton Disabled="@IsNew" Size="Size.Medium" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Calibration</MudButton>
+                    </div>
+                </MudItem>
+                <MudItem xs="6" />
+                <MudItem xs="6" Style="display:flex;">
+                    <MudPaper Class="d-flex align-start pa-2 mx-2 my-2">
+                    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                        <MudGrid>
+                                @* <MudTextField @ref="input" T="string" Label="DeviceId" Required="true" RequiredError="DeviceId is required!" Class="mr-4"/> *@
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.h6">Configuration</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.subtitle1" GutterBottom="true">Display</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField @bind-Value="@device.ScaleDisplayTimeout" Label="Display timeout" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.subtitle1" GutterBottom="true">RFID</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField @bind-Value="@device.RfidTagDecay" Label="RFID Tag decay" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.subtitle1" GutterBottom="true">Calibration</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField @bind-Value="@device.CalibrationFactor" Label="Calibration factor" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField @bind-Value="@device.ScaleCalibrationWeight" Label="Calibration weight" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.subtitle1" GutterBottom="true">Other</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField @bind-Value="@device.ScaleUpdateInterval" Label="Update interval" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField @bind-Value="@device.ScaleSamplingSize" Label="Sampling size" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                                </MudItem>
+                        </MudGrid>
+                    </MudForm>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6" Style="display:flex;">
+                    <MudPaper Class="d-flex align-start pa-2 mx-2 my-2" Width="100%">
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.h6">Log</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <ul id="messagesList">
+                                    @foreach (var message in messages)
+                                    {
+                                        <li>@message</li>
+                                    }
+                                </ul>
+                            </MudItem>
+                        </MudGrid>
+
                     </MudPaper>
                 </MudItem>
             }
@@ -34,8 +96,9 @@
         </MudGrid>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="Delete">Delete</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -44,12 +107,24 @@
     [Parameter] public string DeviceId { get; set; } = string.Empty;
     [Parameter] public bool IsNew { get; set; }
     [Inject] HttpClient HttpClient { get; set; }
+    [Inject] NavigationManager Navigation { get; set; }
 
+    private MudForm form;
     private Device device = new Device();
     private bool loading = false;
+    private bool success;
+    private string[] errors = { };
+    private HubConnection? hubConnection;
+    private readonly List<string> messages = new List<string>();
+    private void Cancel() => MudDialog.CancelAll();
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
-    void Cancel() => MudDialog.CancelAll();
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,8 +135,54 @@
             if (!string.IsNullOrWhiteSpace(DeviceId)) await LoadDeviceData(DeviceId);
         }
         else device.Name = DeviceId;
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/messages"))
+            .Build();
+
+        hubConnection.On<string, int>("Status", (deviceId, value) =>
+        {
+            var encodedMsg = $"status - {deviceId}: {value}g";
+            messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        hubConnection.On<string, int, Guid>("KnownStatus", (deviceId, value, spoolId) =>
+        {
+            var encodedMsg = $"status - {deviceId}: {value}g ({spoolId})";
+            messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        hubConnection.On<string, string>("Heartbeat", (deviceId, status) =>
+        {
+            var encodedMsg = $"heartbeat - {deviceId}: {status}";
+            messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        hubConnection.On<string, int>("Response", (deviceId, result) =>
+        {
+            var encodedMsg = $"Response - {deviceId}: {result}";
+            messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
     }
 
+    private async Task Save()
+    {
+        if (form.IsValid)
+        {
+            if (await SaveDeviceData()) MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    private async Task Delete()
+    {
+        if (await DeleteDevice()) MudDialog.Close(DialogResult.Ok(true));
+    }
 
     private async Task LoadDeviceData(string deviceId)
     {
@@ -84,6 +205,15 @@
     {
         loading = true;
         var response = await HttpClient.PostAsJsonAsync($"api/Devices", device);
+        var result = response.IsSuccessStatusCode;
+        loading = false;
+        return result;
+    }
+
+    private async Task<bool> DeleteDevice()
+    {
+        loading = true;
+        var response = await HttpClient.DeleteAsync($"api/Devices/{device.Id}"); 
         var result = response.IsSuccessStatusCode;
         loading = false;
         return result;

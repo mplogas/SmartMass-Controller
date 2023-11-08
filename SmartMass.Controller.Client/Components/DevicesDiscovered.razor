@@ -61,12 +61,12 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Inject] HttpClient HttpClient { get; set; }
-    bool success;
-    string[] errors = { };
+    private bool success;
+    private string[] errors = { };
 
     private bool loading = false;
-    MudForm form;
-    MudTextField<string> input;
+    private MudForm form;
+    private MudTextField<string> input;
 
     void Cancel() => MudDialog.Cancel();
 
