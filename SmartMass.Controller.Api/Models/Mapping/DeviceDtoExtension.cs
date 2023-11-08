@@ -25,6 +25,7 @@ namespace SmartMass.Controller.Api.Models.Mapping
             {
                 Id = dto.Id,
                 Name = dto.Name,
+                ClientId = dto.ClientId,
                 CalibrationFactor = dto.CalibrationFactor,
                 ScaleCalibrationWeight = dto.ScaleCalibrationWeight,
                 ScaleSamplingSize = dto.ScaleSamplingSize,
@@ -37,6 +38,7 @@ namespace SmartMass.Controller.Api.Models.Mapping
         private static void Map(this DeviceDto dto, Device pageModel)
         {
             dto.Name = pageModel.Name;
+            dto.ClientId = pageModel.ClientId;
             dto.CalibrationFactor = pageModel.CalibrationFactor;
             dto.ScaleCalibrationWeight = pageModel.ScaleCalibrationWeight;
             dto.ScaleSamplingSize = pageModel.ScaleSamplingSize;
