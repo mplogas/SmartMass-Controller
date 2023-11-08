@@ -19,6 +19,7 @@
                         <MudGrid>
                             <MudItem xs="11" Class="d-flex align-center justify-center">
                                 <MudText Typo="Typo.h3">@device.Name</MudText>
+                                <MudText Typo="Typo.body2">@device.ClientId</MudText>
                             </MudItem>
                             <MudItem xs="1" Class="d-flex align-start">
                                 <MudIcon Icon="@Icons.Material.Filled.Check"></MudIcon>
@@ -26,8 +27,8 @@
                         </MudGrid>
                     </MudPaper>
                     <div class="d-flex justify-end pa-2 mx-2 my-2">
-                        <MudButton Disabled="@IsNew" Size="Size.Medium" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Send Config</MudButton>
-                        <MudButton Disabled="@IsNew" Size="Size.Medium" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4">Calibration</MudButton>
+                        <MudButton Disabled="@IsNew" Size="Size.Medium" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4" OnClick="SendConfig">Send Config</MudButton>
+                        <MudButton Disabled="@IsNew" Size="Size.Medium" Variant="Variant.Filled" Color="Color.Primary" Class="ml-4" OnClick="StartCalibration">Calibration</MudButton>
                     </div>
                 </MudItem>
                 <MudItem xs="6" />
@@ -96,7 +97,7 @@
         </MudGrid>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Close">Close</MudButton>
         <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="Delete">Delete</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
     </DialogActions>
@@ -116,7 +117,7 @@
     private string[] errors = { };
     private HubConnection? hubConnection;
     private readonly List<string> messages = new List<string>();
-    private void Cancel() => MudDialog.CancelAll();
+    private void Close() => MudDialog.CancelAll();
 
     public async ValueTask DisposeAsync()
     {
@@ -134,7 +135,7 @@
         {
             if (!string.IsNullOrWhiteSpace(DeviceId)) await LoadDeviceData(DeviceId);
         }
-        else device.Name = DeviceId;
+        else device.ClientId = device.Name = DeviceId;
 
         hubConnection = new HubConnectionBuilder()
             .WithUrl(Navigation.ToAbsoluteUri("/messages"))
@@ -175,7 +176,25 @@
     {
         if (form.IsValid)
         {
-            if (await SaveDeviceData()) MudDialog.Close(DialogResult.Ok(true));
+            if (IsNew)
+            {
+                if (await SaveDeviceData())
+                {
+    //MudDialog.Close(DialogResult.Ok(true));
+                    IsNew = false;
+                    await LoadDeviceData(device.ClientId);
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                if (await UpdateDeviceData())
+                {
+                    await LoadDeviceData(device.ClientId);
+                    StateHasChanged();
+                }
+            }
+
         }
     }
 
@@ -201,6 +220,15 @@
         loading = false;
     }
 
+    private async Task<bool> UpdateDeviceData()
+    {
+        loading = true;
+        var response = await HttpClient.PutAsJsonAsync($"api/Devices/{device.Id}", device);
+        var result = response.IsSuccessStatusCode;
+        loading = false;
+        return result;
+    }
+
     private async Task<bool> SaveDeviceData()
     {
         loading = true;
@@ -218,4 +246,21 @@
         loading = false;
         return result;
     }
+
+    private async Task SendConfig()
+    {
+        loading = true;
+        var response = await HttpClient.PostAsJsonAsync($"api/Devices/configure/{device.Id}", string.Empty);
+        var result = response.IsSuccessStatusCode;
+        loading = false;
+    }
+
+    private async Task StartCalibration()
+    {
+        loading = true;
+        var response = await HttpClient.PostAsJsonAsync($"api/Devices/calibrate/{device.Id}", string.Empty);
+        var result = response.IsSuccessStatusCode;
+        loading = false;
+    }
+
 }

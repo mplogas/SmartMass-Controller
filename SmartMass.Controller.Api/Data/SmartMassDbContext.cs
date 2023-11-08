@@ -57,12 +57,15 @@ namespace SmartMass.Controller.Api.Data
             modelBuilder.Entity<SpoolDto>().Property(p => p.Created).HasDefaultValue(DateTime.UtcNow);
 
             modelBuilder.Entity<DeviceDto>().HasKey(k => k.Id);
+            modelBuilder.Entity<DeviceDto>().HasIndex(i => i.ClientId).IsUnique();
+            modelBuilder.Entity<DeviceDto>().Property(p => p.ClientId).IsRequired();
             modelBuilder.Entity<DeviceDto>().Property(p => p.Name).IsRequired();
             modelBuilder.Entity<DeviceDto>().Property(p => p.CalibrationFactor).HasDefaultValue(981).IsRequired();
             modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleUpdateInterval).HasDefaultValue(1000).IsRequired();
             modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleSamplingSize).HasDefaultValue(1).IsRequired();
             modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleCalibrationWeight).HasDefaultValue(100).IsRequired();
             modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleDisplayTimeout).HasDefaultValue(60000).IsRequired();
+            modelBuilder.Entity<DeviceDto>().Property(p => p.RfidDecay).HasDefaultValue(15000).IsRequired();
 
             modelBuilder.Entity<MqttLogEntryDto>().HasKey(k => k.Id);
             modelBuilder.Entity<MqttLogEntryDto>().Property(p => p.SpoolId).IsRequired();

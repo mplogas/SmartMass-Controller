@@ -184,7 +184,7 @@ public class DevicesController : ControllerBase
         return NotFound();
     }
 
-    [HttpPost("{id}/configure")]
+    [HttpPost("configure/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -224,7 +224,7 @@ public class DevicesController : ControllerBase
         }
     }
 
-    [HttpPost("{id}/tare")]
+    [HttpPost("tare/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -249,7 +249,7 @@ public class DevicesController : ControllerBase
         }
     }
 
-    [HttpPost("{id}/calibrate")]
+    [HttpPost("calibrate/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
