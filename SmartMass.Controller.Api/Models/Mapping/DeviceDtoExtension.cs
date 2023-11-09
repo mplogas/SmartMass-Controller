@@ -8,7 +8,6 @@ namespace SmartMass.Controller.Api.Models.Mapping
         public static void MapFrom(this DeviceDto dto, Device pageModel)
         {
             dto.Map(pageModel);
-            dto.Id = pageModel.Id;
             dto.Updated = DateTime.UtcNow;
         }
 
@@ -23,7 +22,6 @@ namespace SmartMass.Controller.Api.Models.Mapping
         {
             return new Device()
             {
-                Id = dto.Id,
                 Name = dto.Name,
                 ClientId = dto.ClientId,
                 CalibrationFactor = dto.CalibrationFactor,

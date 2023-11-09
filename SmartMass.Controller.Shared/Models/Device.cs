@@ -4,8 +4,6 @@ namespace SmartMass.Controller.Shared.Models
 {
     public class Device 
     {
-        public int Id { get; set; }
-
         [Required]
         [StringLength(256, ErrorMessage = "ClientId cannot be larger than 256 character according to the MQTT specs.")]
         [RegularExpression("^\\S+$", ErrorMessage = "MQTT specs does not allow spaces in clientId")]

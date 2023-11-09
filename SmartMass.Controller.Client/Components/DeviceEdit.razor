@@ -206,7 +206,7 @@
     private async Task LoadDeviceData(string deviceId)
     {
         loading = true;
-        var response = await HttpClient.GetAsync($"api/Devices/deviceid/{deviceId}");
+        var response = await HttpClient.GetAsync($"api/Devices/{deviceId}");
         if (response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadFromJsonAsync<Device>();
@@ -223,7 +223,7 @@
     private async Task<bool> UpdateDeviceData()
     {
         loading = true;
-        var response = await HttpClient.PutAsJsonAsync($"api/Devices/{device.Id}", device);
+        var response = await HttpClient.PutAsJsonAsync($"api/Devices/{device.ClientId}", device);
         var result = response.IsSuccessStatusCode;
         loading = false;
         return result;
@@ -241,7 +241,7 @@
     private async Task<bool> DeleteDevice()
     {
         loading = true;
-        var response = await HttpClient.DeleteAsync($"api/Devices/{device.Id}"); 
+        var response = await HttpClient.DeleteAsync($"api/Devices/{device.ClientId}"); 
         var result = response.IsSuccessStatusCode;
         loading = false;
         return result;
@@ -250,7 +250,7 @@
     private async Task SendConfig()
     {
         loading = true;
-        var response = await HttpClient.PostAsJsonAsync($"api/Devices/configure/{device.Id}", string.Empty);
+        var response = await HttpClient.PostAsJsonAsync($"api/Devices/configure/{device.ClientId}", string.Empty);
         var result = response.IsSuccessStatusCode;
         loading = false;
     }
@@ -258,7 +258,7 @@
     private async Task StartCalibration()
     {
         loading = true;
-        var response = await HttpClient.PostAsJsonAsync($"api/Devices/calibrate/{device.Id}", string.Empty);
+        var response = await HttpClient.PostAsJsonAsync($"api/Devices/calibrate/{device.ClientId}", string.Empty);
         var result = response.IsSuccessStatusCode;
         loading = false;
     }

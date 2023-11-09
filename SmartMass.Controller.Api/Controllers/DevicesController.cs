@@ -56,26 +56,8 @@ public class DevicesController : ControllerBase
         return Problem("no handle");
     }
 
-    // GET api/<DevicesController>/5
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Device>> Get(int id)
-    {
-        if (dbContext.Devices != null)
-        {
-            var device = await dbContext.Devices.FindAsync(id);
-            if (device != null)
-                return device.MapTo();
-            return NotFound();
-        }
-
-        return Problem("no context");
-    }
-
-    // GET: api/<DevicesController>/deviceid/device_id
-    [HttpGet("deviceid/{deviceId}")]
+    // GET: api/<DevicesController>/device_id
+    [HttpGet("{deviceId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -118,28 +100,28 @@ public class DevicesController : ControllerBase
                 return Problem(e.Message);
             }
 
-            device.Id = dto.Id;
-            return CreatedAtAction(nameof(Get), new { id = dto.Id }, device);
+            return CreatedAtAction(nameof(Get), new { device_id = dto.ClientId }, device);
         }
 
         return BadRequest(ModelState);
     }
 
     // PUT api/<DevicesController>/5
-    [HttpPut("{id}")]
+    [HttpPut("{deviceId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Put(int id, [FromBody] Device device)
+    public async Task<IActionResult> Put(string deviceId, [FromBody] Device device)
     {
-        if (id != device.Id) return BadRequest();
+        if (deviceId != device.ClientId) return BadRequest();
 
         if (ModelState.IsValid)
         {
-            var dto = new DeviceDto();
-            dto.MapFrom(device);
+            var dto = await GetDevice(deviceId);
+            if(dto == null) return NotFound();
 
+            dto.MapFrom(device);
             dbContext.Entry(dto).State = EntityState.Modified;
             try
             {
@@ -147,8 +129,6 @@ public class DevicesController : ControllerBase
             }
             catch (DbUpdateException e)
             {
-                if (DeviceExists(id))
-                    return NotFound();
                 return Problem(e.Message);
             }
 
@@ -159,40 +139,37 @@ public class DevicesController : ControllerBase
     }
 
     // DELETE api/<DevicesController>/5
-    [HttpDelete("{id}")]
+    [HttpDelete("{deviceId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(string deviceId)
     {
-        var item = await dbContext.Devices.FindAsync(id);
-        if (item != null)
-        {
-            dbContext.Devices.Remove(item);
-            try
-            {
-                await dbContext.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                return Problem(e.Message);
-            }
+        var dto = await GetDevice(deviceId);
+        if (dto == null) return NotFound();
 
-            return NoContent();
+        dbContext.Devices.Remove(dto);
+        try
+        {
+            await dbContext.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message);
         }
 
-        return NotFound();
+        return NoContent();
     }
 
-    [HttpPost("configure/{id}")]
+    [HttpPost("configure/{deviceId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Configure(int id)
+    public async Task<IActionResult> Configure(string deviceId)
     {
         try
         {
-            var dto = await dbContext.Devices.FindAsync(id);
+            var dto = await GetDevice(deviceId);
             if (dto == null) return NotFound();
 
             dynamic dynObj = new
@@ -224,15 +201,15 @@ public class DevicesController : ControllerBase
         }
     }
 
-    [HttpPost("tare/{id}")]
+    [HttpPost("tare/{deviceID}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Tare(int id)
+    public async Task<IActionResult> Tare(string deviceId)
     {
         try
         {
-            var dto = await dbContext.Devices.FindAsync(id);
+            var dto = await GetDevice(deviceId);
             if (dto == null) return NotFound();
 
             dynamic dynObj = new
@@ -249,15 +226,15 @@ public class DevicesController : ControllerBase
         }
     }
 
-    [HttpPost("calibrate/{id}")]
+    [HttpPost("calibrate/{deviceId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Calibrate(int id)
+    public async Task<IActionResult> Calibrate(string deviceId)
     {
         try
         {
-            var dto = await dbContext.Devices.FindAsync(id);
+            var dto = await GetDevice(deviceId);
             if (dto == null) return NotFound();
 
             dynamic dynObj = new
@@ -274,10 +251,18 @@ public class DevicesController : ControllerBase
         }
     }
 
-    private bool DeviceExists(long id)
+    private bool DeviceExists(string deviceId)
     {
-        return dbContext.Devices.Any(e => e.Id == id);
+        return dbContext.Devices.Any(e => e.ClientId == deviceId);
     }
 
+    private async Task<DeviceDto> GetDevice(string deviceId)
+    {
+        if (DeviceExists(deviceId))
+        {
+            return await dbContext.Devices.FirstOrDefaultAsync(d => d.ClientId.Equals(deviceId, StringComparison.InvariantCultureIgnoreCase));
+        }
 
+        return null;
+    }
 }
