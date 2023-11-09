@@ -11,57 +11,59 @@
     <MudItem xs="12">
         <MudText Class="ms-2" Typo="Typo.h3">Devices</MudText>
     </MudItem>
+    <MudItem xs="12" Class="d-inline-flex justify-end">
+        <MudButton @onclick="AddDevice" Variant="Variant.Filled" Color="Color.Primary">Add new Device</MudButton>
+    </MudItem>
     <MudItem xs="12" Class="d-flex align-content-center justify-center flex-wrap">
-            @if (loading)
+        @if (!hasLoaded || devices.Count == 0)
+        {
+            <MudCard Class="ma-2" Style="position:relative;">
+                <MudCardContent>
+                    <MudSkeleton Width="30%" Height="42px;" />
+                    <MudSkeleton Width="80%" Height="85px;" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudSkeleton Width="65px" Height="40px" Class="ml-2" />
+                    <MudSkeleton Width="65px" Height="40px" Class="ml-3" />
+                </MudCardActions>
+            </MudCard>
+        }
+        else
+        {
+            @foreach (var device in devices)
             {
-                <MudProgressCircular Class="ms-n1" Size="Size.Medium" Indeterminate="true"/>
-                <MudText Class="ms-2" Typo="Typo.body1">Processing</MudText>
+                <MudCard Class="ma-2" Outlined="true" Style="position:relative;">
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="10">
+                                <MudText Typo="Typo.subtitle1">@device.Name</MudText>
+                            </MudItem>
+                            <MudItem xs="2">
+                                <MudIcon Icon="@Icons.Material.Filled.Check"></MudIcon>
+                            </MudItem>
+                            <MudItem xs="12" Class="d-inline-flex justify-end">
+                                @if (status.TryGetValue(device.ClientId, out var value))
+                                {
+                                    @* <MudText Typo="Typo.body2" Class="mr-4">( Sunlu PLA Red )</MudText> *@
+                                    <MudText Typo="Typo.h4">@value</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.h4">0</MudText>
+                                }
+                                <MudText Typo="Typo.h4">&nbsp;g</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="@((e) => TareDevice(device.ClientId))">Tare</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="@((e) => EditDevice(device.ClientId))">Edit</MudButton>
+                    </MudCardActions>
+                </MudCard>
             }
-            else
-            {
-                @foreach (var device in devices)
-                {
-                    <MudCard Outlined="true" Class="ma-2">
-                        <MudCardContent>
-                            <MudGrid>
-                                <MudItem xs="10">
-                                    <MudText Typo="Typo.subtitle1">@device.Name</MudText>
-                                </MudItem>
-                                <MudItem xs="2">
-                                    <MudIcon Icon="@Icons.Material.Filled.Check"></MudIcon>
-                                </MudItem>
-                                <MudItem xs="12" Class="d-inline-flex justify-end">
-                                    @if (status.TryGetValue(device.ClientId, out var value))
-                                    {
-                                        @* <MudText Typo="Typo.body2" Class="mr-4">( Sunlu PLA Red )</MudText> *@
-                                        <MudText Typo="Typo.h4">@value</MudText>
-                                    }
-                                    else
-                                    {
-                                        <MudText Typo="Typo.h4">0</MudText>
-                                    }
-                                    <MudText Typo="Typo.h4">&nbsp;g</MudText>
-                                </MudItem>
-                            </MudGrid>
-                        </MudCardContent>
-                        <MudCardActions>
-                            <MudButton Variant="Variant.Filled" Color="Color.Secondary" @onclick="@((e) => TareDevice(device.ClientId))">Tare</MudButton>
-                            <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="@((e) => EditDevice(device.ClientId))">Edit</MudButton>
-                        </MudCardActions>
-                    </MudCard>
-                }
-                
-            }
+        }
     </MudItem>
 </MudGrid>
-
-<h3>Devices</h3>
-<MudButton @onclick="AddDevice" Variant="Variant.Filled" Color="Color.Primary">
-    Add new Device
-</MudButton>
-<MudButton @onclick="@((e) => EditDevice("scale-01"))" Variant="Variant.Filled" Color="Color.Primary">
-    Edit Device
-</MudButton>
 
 
 <style>
@@ -74,7 +76,6 @@
 @code {
     [Inject] HttpClient HttpClient { get; set; }
     private HubConnection? hubConnection;
-    private bool loading = false;
     private bool hasLoaded = false;
     private List<Device> devices = new List<Device>();
     private readonly Dictionary<string, int> status = new Dictionary<string, int>();
@@ -152,8 +153,6 @@
 
     private async Task LoadData()
     {
-        loading = true;
-        StateHasChanged();
         var response = await HttpClient.GetAsync("api/Devices");
         var result = await response.Content.ReadFromJsonAsync<IEnumerable<Device>>();
         if (result != null)
@@ -162,7 +161,6 @@
             devices.AddRange(result);
         }
         hasLoaded = true;
-        loading = false;
         StateHasChanged();
     }
 
@@ -170,5 +168,4 @@
     {
         var response = await HttpClient.PostAsync($"api/Devices/tare/{deviceId}", null);
     }
-
 }
