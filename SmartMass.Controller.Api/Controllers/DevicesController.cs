@@ -242,7 +242,7 @@ public class DevicesController : ControllerBase
                 action = "calibrate"
             };
             
-            mqttClient.Publish(Helper.BuildMqttTopic(mqttTopicBase, "command", dto.ClientId), Convert.ToString(dynObj));
+            mqttClient.Publish(Helper.BuildMqttTopic(mqttTopicBase, "command", dto.ClientId), JsonConvert.SerializeObject(dynObj));
             return Ok();
         }
         catch (Exception e)
@@ -260,7 +260,7 @@ public class DevicesController : ControllerBase
     {
         if (DeviceExists(deviceId))
         {
-            return await dbContext.Devices.FirstOrDefaultAsync(d => d.ClientId.Equals(deviceId, StringComparison.InvariantCultureIgnoreCase));
+            return await dbContext.Devices.FirstOrDefaultAsync(d => d.ClientId == deviceId);
         }
 
         return null;
