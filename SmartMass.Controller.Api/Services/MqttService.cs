@@ -75,10 +75,13 @@ namespace SmartMass.Controller.Api.Services
                 if(!string.IsNullOrWhiteSpace(payload.device_id)) {
                     if(Guid.TryParse(payload.spool_id, out var spoolId)) 
                     {
-                        var scopedDbContext = scope.ServiceProvider.GetRequiredService<SmartMassDbContext>();
-                        var entry = new MqttLogEntryDto(spoolId, payload.value, DateTime.UtcNow);
-                        scopedDbContext.MqttValues.Add(entry);
-                        await scopedDbContext.SaveChangesAsync();
+                        if (payload.value > 0)
+                        {
+                            var scopedDbContext = scope.ServiceProvider.GetRequiredService<SmartMassDbContext>();
+                            var entry = new MqttLogEntryDto(spoolId, payload.value, DateTime.UtcNow);
+                            scopedDbContext.MqttValues.Add(entry);
+                            await scopedDbContext.SaveChangesAsync();
+                        }
                         await scopedHub.Clients.All.SendAsync("KnownStatus", payload.device_id, payload.value, spoolId);
                     }
                     else
