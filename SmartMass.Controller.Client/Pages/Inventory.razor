@@ -1,6 +1,84 @@
 ﻿@page "/inventory"
-<h3>Inventory</h3>
+@using SmartMass.Controller.Client.Components
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+
+<PageTitle>Inventory</PageTitle>
+<MudGrid Class="pa-4">
+    <MudItem xs="12">
+        <MudText Class="ms-2" Typo="Typo.h3">Inventory</MudText>
+    </MudItem>
+    <MudItem xs="12" Class="d-inline-flex justify-end">
+        <MudButton @onclick="AddSpool" Variant="Variant.Filled" Color="Color.Primary">Add new Spool</MudButton>
+    </MudItem>
+    <MudItem xs="12" Class="d-flex align-content-center justify-center flex-wrap">
+        @if (!hasLoaded || spools.Count == 0)
+        {
+            <MudCard Class="ma-2" Style="position:relative;">
+                <MudCardContent>
+                    <MudSkeleton Width="30%" Height="42px;" />
+                    <MudSkeleton Width="80%" Height="85px;" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudSkeleton Width="65px" Height="40px" Class="ml-2" />
+                    <MudSkeleton Width="65px" Height="40px" Class="ml-3" />
+                </MudCardActions>
+            </MudCard>
+        }
+        else
+        {
+            @foreach (var spool in spools)
+            {
+                <MudCard Class="ma-2" Outlined="true" Style="position:relative;">
+                    <MudCardContent>
+                        <MudText Typo="Typo.subtitle1">@spool.Name</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="@((e) => WriteTag(spool.Id))">Write Tag</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="@((e) => EditSpool(spool.Id))">Edit</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            }
+        }
+    </MudItem>
+</MudGrid>
 
 @code {
+   [Inject] HttpClient HttpClient { get; set; }
+    private bool hasLoaded = false;
+    private List<Spool> spools = new List<Spool>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var response = await HttpClient.GetAsync("api/Inventory");
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<Spool>>();
+        if (result != null)
+        {
+            spools.Clear();
+            spools.AddRange(result);
+        }
+        hasLoaded = true;
+        StateHasChanged();
+    }
+
+    private Task AddSpool()
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task WriteTag(Guid spoolId)
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task EditSpool(Guid spoolId)
+    {
+            throw new NotImplementedException();
+    }
 
 }
