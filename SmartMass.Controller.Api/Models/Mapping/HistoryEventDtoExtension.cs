@@ -5,9 +5,9 @@ namespace SmartMass.Controller.Api.Models.Mapping
 {
     public static class HistoryEventDtoExtension
     {
-        public static Event MapTo(this HistoryEventDto dto)
+        public static HistoryEvent MapTo(this HistoryEventDto dto)
         {
-            return new Event()
+            return new HistoryEvent()
             {
                 SpoolId = dto.SpoolId,
                 Value = dto.Value,

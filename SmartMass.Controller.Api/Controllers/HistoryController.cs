@@ -30,13 +30,13 @@ namespace SmartMass.Controller.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<Event>> GetMqttLogEntryDto(Guid spool_id)
+        public ActionResult<IEnumerable<HistoryEvent>> GetMqttLogEntryDto(Guid spool_id)
         {
             if (spool_id != Guid.Empty)
             {
                 if (dbContext.MqttValues != null)
                 {
-                    var result = new List<Event>();
+                    var result = new List<HistoryEvent>();
                     var tmp = dbContext.MqttValues.Where(e => e.SpoolId == spool_id);
                     foreach (var e in tmp)
                     {

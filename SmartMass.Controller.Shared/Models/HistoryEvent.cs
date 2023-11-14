@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmartMass.Controller.Shared.Models
 {
-    public class Event
+    public class HistoryEvent
     {
         public Guid SpoolId { get; set; }
         public long Value { get; set; }
