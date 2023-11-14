@@ -32,7 +32,7 @@ namespace SmartMass.Controller.Api.Data
         public DbSet<MaterialDto> Materials { get; set; }
         public DbSet<SpoolDto> Spools { get; set; }
         public DbSet<DeviceDto> Devices { get; set; }
-        public DbSet<MqttLogEntryDto> MqttValues { get; set; }
+        public DbSet<HistoryEventDto> MqttValues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,10 +67,10 @@ namespace SmartMass.Controller.Api.Data
             modelBuilder.Entity<DeviceDto>().Property(p => p.ScaleDisplayTimeout).HasDefaultValue(60000).IsRequired();
             modelBuilder.Entity<DeviceDto>().Property(p => p.RfidDecay).HasDefaultValue(15000).IsRequired();
 
-            modelBuilder.Entity<MqttLogEntryDto>().HasKey(k => k.Id);
-            modelBuilder.Entity<MqttLogEntryDto>().Property(p => p.SpoolId).IsRequired();
-            modelBuilder.Entity<MqttLogEntryDto>().Property(p => p.Value).IsRequired();
-            modelBuilder.Entity<MqttLogEntryDto>().Property(p => p.Received).IsRequired();
+            modelBuilder.Entity<HistoryEventDto>().HasKey(k => k.Id);
+            modelBuilder.Entity<HistoryEventDto>().Property(p => p.SpoolId).IsRequired();
+            modelBuilder.Entity<HistoryEventDto>().Property(p => p.Value).IsRequired();
+            modelBuilder.Entity<HistoryEventDto>().Property(p => p.Received).IsRequired();
         }
     }
 }

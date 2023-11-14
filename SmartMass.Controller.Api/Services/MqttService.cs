@@ -78,7 +78,7 @@ namespace SmartMass.Controller.Api.Services
                         if (payload.value > 0)
                         {
                             var scopedDbContext = scope.ServiceProvider.GetRequiredService<SmartMassDbContext>();
-                            var entry = new MqttLogEntryDto(spoolId, payload.value, DateTime.UtcNow);
+                            var entry = new HistoryEventDto(spoolId, payload.value, DateTime.UtcNow);
                             scopedDbContext.MqttValues.Add(entry);
                             await scopedDbContext.SaveChangesAsync();
                         }

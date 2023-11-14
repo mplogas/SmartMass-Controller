@@ -1,8 +1,8 @@
 ﻿namespace SmartMass.Controller.Api.Models.DTOs
 {
-    public class MqttLogEntryDto
+    public class HistoryEventDto
     {
-        public MqttLogEntryDto(Guid spoolId, long value, DateTime received)
+        public HistoryEventDto(Guid spoolId, long value, DateTime received)
         {
             SpoolId = spoolId;
             Value = value;
