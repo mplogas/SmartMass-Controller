@@ -159,17 +159,18 @@ namespace SmartMass.Controller.Api.Controllers
             return NotFound();
         }
 
-        [HttpPost("{id}/write-tag")]
+        [HttpPost("write-tag/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> WriteTag(Guid id, int deviceId)
+        public async Task<IActionResult> WriteTag(Guid id, string deviceId)
         {
             try
             {
                 var dto = await dbContext.Spools.Include(m => m.ManufacturerDto).Include(m => m.MaterialDto)
                     .FirstOrDefaultAsync(s => s.Id == id);
-                var dev = await dbContext.Devices.FindAsync(deviceId);
+
+                var dev = await dbContext.Devices.FirstOrDefaultAsync(d => d.ClientId == deviceId);
                 if (dto == null || dev == null) return NotFound();
 
                 dynamic dynObj = new
