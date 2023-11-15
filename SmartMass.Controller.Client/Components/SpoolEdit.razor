@@ -1,0 +1,200 @@
+﻿<MudDialog DisableSidePadding="false" >
+    <DialogContent>
+        <MudGrid>
+            @if (loading)
+            {
+                <MudItem xs="12">
+                    <MudProgressCircular Class="ms-n1" Size="Size.Large" Indeterminate="true"/>
+                    <MudText Class="ms-2" Typo="Typo.body1">Processing</MudText>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="12">
+                    <MudPaper Class="d-flex align-center justify-center pa-2 mx-2 my-2">
+                        <MudText Typo="Typo.h3">@spool.Name</MudText>
+                    </MudPaper>
+                </MudItem>
+
+            }
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Close">Close</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="Delete">Delete</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Guid SpoolId { get; set; } = Guid.Empty;
+    [Parameter] public bool IsNew { get; set; }
+    [Inject] HttpClient HttpClient { get; set; }
+
+    private MudForm form;
+    private Spool spool = new Spool();
+    private List<Manufacturer> manufacturers = new List<Manufacturer>();
+    private List<Material> materials = new List<Material>();
+    private List<HistoryEvent> history = new List<HistoryEvent>();
+    private bool loading = false;
+    private bool success;
+    private string[] errors = { };
+    private readonly List<string> messages = new List<string>();
+    private void Close() => MudDialog.CancelAll();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await LoadManufacturersData();
+        await LoadMaterialsData();
+
+        if (!IsNew)
+        {
+            if (SpoolId != Guid.Empty)
+            {
+                await LoadSpoolData(SpoolId);
+                await LoadHistoryData(SpoolId);
+            }
+        }
+    }
+
+    private async Task LoadManufacturersData()
+    {
+        loading = true;
+        StateHasChanged();
+
+        var response = await HttpClient.GetAsync($"api/Manufacturers");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Manufacturer>>();
+            if (result != null)
+            {
+                manufacturers.Clear();
+                manufacturers.AddRange(result);
+                StateHasChanged();
+            }
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    private async Task LoadHistoryData(Guid spoolId)
+    {
+        loading = true;
+        StateHasChanged();
+        var response = await HttpClient.GetAsync($"api/History/{spoolId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<HistoryEvent>>();
+            if (result != null)
+            {
+                history.Clear();
+                history.AddRange(result);
+                StateHasChanged();
+            }
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    private async Task LoadMaterialsData()
+    {
+        loading = true;
+        StateHasChanged();
+
+        var response = await HttpClient.GetAsync($"api/Materials");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Material>>();
+            if (result != null)
+            {
+                materials.Clear();
+                materials.AddRange(result);
+                StateHasChanged();
+            }
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    private async Task LoadSpoolData(Guid spoolId)
+    {
+        loading = true;
+        StateHasChanged();
+        var response = await HttpClient.GetAsync($"api/Inventory/{spoolId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Spool>();
+            if (result != null)
+            {
+                spool = result;
+                StateHasChanged();
+            }
+        } // TODO: ...something, something error message
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    private async Task Delete()
+    {
+        if (await DeleteSpoolData()) MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private async Task Save()
+    {
+        if (form.IsValid)
+        {
+            loading = true;
+            StateHasChanged();
+            if (IsNew)
+            {
+                if (await SaveSpoolData())
+                {
+                    IsNew = false;
+                    await LoadSpoolData(spool.Id);
+                }
+            }
+            else
+            {
+                if (await UpdateSpoolData())
+                {
+                    await LoadSpoolData(spool.Id);
+                }
+            }
+            loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task<bool> UpdateSpoolData()
+    {
+        var response = await HttpClient.PutAsJsonAsync($"api/Inventory/{spool.Id}", spool);
+        var result = response.IsSuccessStatusCode;
+
+        return result;
+    }
+
+    private async Task<bool> SaveSpoolData()
+    {
+        var response = await HttpClient.PostAsJsonAsync($"api/Inventory", spool);
+        var result = response.IsSuccessStatusCode;
+        //TODO: read GUID from response
+
+        return result;
+    }
+
+    private async Task<bool> DeleteSpoolData()
+    {
+        var response = await HttpClient.DeleteAsync($"api/Inventory/{spool.Id}");
+        var result = response.IsSuccessStatusCode;
+
+        return result;
+    }
+
+}

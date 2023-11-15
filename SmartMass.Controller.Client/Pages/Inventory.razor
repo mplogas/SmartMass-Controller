@@ -47,6 +47,9 @@
    [Inject] HttpClient HttpClient { get; set; }
     private bool hasLoaded = false;
     private List<Spool> spools = new List<Spool>();
+    private List<Device> devices = new List<Device>();
+    private List<Manufacturer> manufacturers = new List<Manufacturer>();
+    private List<Material> materials = new List<Material>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,29 +59,98 @@
     private async Task LoadData()
     {
         var response = await HttpClient.GetAsync("api/Inventory");
-        var result = await response.Content.ReadFromJsonAsync<IEnumerable<Spool>>();
-        if (result != null)
+        if (response.IsSuccessStatusCode)
         {
-            spools.Clear();
-            spools.AddRange(result);
+            var s = await response.Content.ReadFromJsonAsync<IEnumerable<Spool>>();
+            if (s != null)
+            {
+                spools.Clear();
+                spools.AddRange(s);
+
+                response = await HttpClient.GetAsync("api/Devices");
+                if (response.IsSuccessStatusCode)
+                {
+                    var d = await response.Content.ReadFromJsonAsync<IEnumerable<Device>>();
+                    if (d != null)
+                    {
+                        devices.Clear();
+                        devices.AddRange(d);
+                    }
+                }
+
+            }
+            hasLoaded = true;
+            StateHasChanged();
         }
-        hasLoaded = true;
-        StateHasChanged();
+
     }
 
-    private Task AddSpool()
+    //TODO: base class that handles loading of data 
+    // something, something @inherits BasePage 
+    // that, and moving to code-behind gets rid of this entire muddy mess that is razor pages.
+
+    private async Task<bool> LoadSpools()
     {
-        throw new NotImplementedException();
+        return false;
     }
 
-    private Task WriteTag(Guid spoolId)
+    private async Task<bool> LoadDevices()
     {
-        throw new NotImplementedException();
+        return false;
+
     }
 
-    private Task EditSpool(Guid spoolId)
+    private async Task<bool> LoadManufacturers()
     {
-            throw new NotImplementedException();
+        return false;
+
+    }
+
+    private async Task<bool> LoadMaterials()
+    {
+        return false;
+
+    }
+
+    private async Task AddSpool()
+    {
+        var parameters = new DialogParameters<SpoolEdit>
+        {
+            { p => p.SpoolId, Guid.Empty },
+            { p => p.IsNew, true }
+        };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, ClassBackground = "dialog-blurred-bg" };
+        var dialog = await DialogService.ShowAsync<Components.SpoolEdit>("Add new spool", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task WriteTag(Guid spoolId)
+    {
+        var response = await HttpClient.PostAsync($"api/Inventory/write-tag/{spoolId}", null);
+    }
+
+    private async Task EditSpool(Guid spoolId)
+    {
+        var parameters = new DialogParameters<SpoolEdit>
+        {
+            { p => p.SpoolId, spoolId },
+            { p => p.IsNew, false }
+        };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, ClassBackground = "dialog-blurred-bg" };
+        var dialog = await DialogService.ShowAsync<Components.SpoolEdit>("Edit spool", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
     }
 
 }
