@@ -1,5 +1,4 @@
-﻿@using SmartMass.Controller.Shared.Models
-@using Microsoft.AspNetCore.SignalR.Client
+﻿@using Microsoft.AspNetCore.SignalR.Client
 @implements IAsyncDisposable
 
 <MudDialog DisableSidePadding="false" >
@@ -14,7 +13,7 @@
             }
             else
             {
-                <MudItem xs="6">
+                <MudItem xs="12">
                     <MudPaper Class="d-flex align-start pa-2 mx-2 my-2">
                         <MudGrid>
                             <MudItem xs="11" Class="d-flex align-center justify-center">
@@ -206,6 +205,7 @@
     private async Task LoadDeviceData(string deviceId)
     {
         loading = true;
+        StateHasChanged();
         var response = await HttpClient.GetAsync($"api/Devices/{deviceId}");
         if (response.IsSuccessStatusCode)
         {
@@ -218,6 +218,7 @@
         } // TODO: ...something, something error message
 
         loading = false;
+        StateHasChanged();
     }
 
     private async Task<bool> UpdateDeviceData()

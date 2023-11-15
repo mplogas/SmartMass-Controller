@@ -140,7 +140,7 @@
             { p => p.IsNew, false }
         };
 
-        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true};
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true, ClassBackground = "dialog-blurred-bg" };
         var dialog = await DialogService.ShowAsync<DeviceEdit>("Configure device", parameters, options);
         var result = await dialog.Result;
 
