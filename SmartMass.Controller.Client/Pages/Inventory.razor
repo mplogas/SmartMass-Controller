@@ -58,31 +58,14 @@
 
     private async Task LoadData()
     {
-        var response = await HttpClient.GetAsync("api/Inventory");
-        if (response.IsSuccessStatusCode)
+        if (await LoadSpools())
         {
-            var s = await response.Content.ReadFromJsonAsync<IEnumerable<Spool>>();
-            if (s != null)
-            {
-                spools.Clear();
-                spools.AddRange(s);
-
-                response = await HttpClient.GetAsync("api/Devices");
-                if (response.IsSuccessStatusCode)
-                {
-                    var d = await response.Content.ReadFromJsonAsync<IEnumerable<Device>>();
-                    if (d != null)
-                    {
-                        devices.Clear();
-                        devices.AddRange(d);
-                    }
-                }
-
-            }
-            hasLoaded = true;
-            StateHasChanged();
+            await LoadDevices();
+            await LoadManufacturers();
+            await LoadMaterials();
         }
-
+        hasLoaded = true;
+        StateHasChanged();
     }
 
     //TODO: base class that handles loading of data 
@@ -91,25 +74,64 @@
 
     private async Task<bool> LoadSpools()
     {
+        var response = await HttpClient.GetAsync("api/Inventory");
+        if (response.IsSuccessStatusCode)
+        {
+            var s = await response.Content.ReadFromJsonAsync<IEnumerable<Spool>>();
+            if (s != null)
+            {
+                spools.Clear();
+                spools.AddRange(s);
+                return true;
+            }
+        }
         return false;
     }
 
     private async Task<bool> LoadDevices()
     {
+        var response = await HttpClient.GetAsync("api/Devices");
+        if (response.IsSuccessStatusCode)
+        {
+            var d = await response.Content.ReadFromJsonAsync<IEnumerable<Device>>();
+            if (d != null)
+            {
+                devices.Clear();
+                devices.AddRange(d);
+                return true;
+            }
+        }
         return false;
-
     }
 
-    private async Task<bool> LoadManufacturers()
+    protected async Task LoadManufacturers()
     {
-        return false;
-
+        var response = await HttpClient.GetAsync($"api/Manufacturers");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Manufacturer>>();
+            if (result != null)
+            {
+                manufacturers.Clear();
+                manufacturers.AddRange(result);
+                StateHasChanged();
+            }
+        }
     }
 
-    private async Task<bool> LoadMaterials()
+    private async Task LoadMaterials()
     {
-        return false;
-
+        var response = await HttpClient.GetAsync($"api/Materials");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Material>>();
+            if (result != null)
+            {
+                materials.Clear();
+                materials.AddRange(result);
+                StateHasChanged();
+            }
+        }
     }
 
     private async Task AddSpool()
