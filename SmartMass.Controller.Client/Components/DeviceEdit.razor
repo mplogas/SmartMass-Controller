@@ -114,7 +114,7 @@
     private bool loading = false;
     private bool success;
     private string[] errors = { };
-    private HubConnection? hubConnection;
+    private HubConnection hubConnection;
     private readonly List<string> messages = new List<string>();
     private void Close() => MudDialog.CancelAll();
 
@@ -175,6 +175,8 @@
     {
         if (form.IsValid)
         {
+            loading = true;
+            StateHasChanged();
             if (IsNew)
             {
                 if (await SaveDeviceData())
@@ -182,7 +184,6 @@
     //MudDialog.Close(DialogResult.Ok(true));
                     IsNew = false;
                     await LoadDeviceData(device.ClientId);
-                    StateHasChanged();
                 }
             }
             else
@@ -190,9 +191,11 @@
                 if (await UpdateDeviceData())
                 {
                     await LoadDeviceData(device.ClientId);
-                    StateHasChanged();
                 }
             }
+            
+            loading = false;
+            StateHasChanged();
 
         }
     }
@@ -223,45 +226,35 @@
 
     private async Task<bool> UpdateDeviceData()
     {
-        loading = true;
         var response = await HttpClient.PutAsJsonAsync($"api/Devices/{device.ClientId}", device);
         var result = response.IsSuccessStatusCode;
-        loading = false;
         return result;
     }
 
     private async Task<bool> SaveDeviceData()
     {
-        loading = true;
         var response = await HttpClient.PostAsJsonAsync($"api/Devices", device);
         var result = response.IsSuccessStatusCode;
-        loading = false;
         return result;
     }
 
     private async Task<bool> DeleteDevice()
     {
-        loading = true;
         var response = await HttpClient.DeleteAsync($"api/Devices/{device.ClientId}"); 
         var result = response.IsSuccessStatusCode;
-        loading = false;
         return result;
     }
 
     private async Task SendConfig()
     {
-        loading = true;
         var response = await HttpClient.PostAsJsonAsync($"api/Devices/configure/{device.ClientId}", string.Empty);
         var result = response.IsSuccessStatusCode;
-        loading = false;
     }
 
     private async Task StartCalibration()
     {
-        loading = true;
         var response = await HttpClient.PostAsJsonAsync($"api/Devices/calibrate/{device.ClientId}", string.Empty);
         var result = response.IsSuccessStatusCode;
-        loading = false;
     }
 
 }

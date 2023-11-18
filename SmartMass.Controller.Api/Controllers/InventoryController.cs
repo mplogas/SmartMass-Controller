@@ -82,7 +82,7 @@ namespace SmartMass.Controller.Api.Controllers
                     }
                     catch (Exception e)
                     {
-                        logger.LogError("Failed to create entry", e);
+                        logger.LogError(e,"Failed to create entry");
                         return Problem(e.Message);
                     }
 
@@ -122,7 +122,7 @@ namespace SmartMass.Controller.Api.Controllers
                     if (SpoolExists(id))
                         return NotFound();
                     
-                    logger.LogError("Failed to update entry", e);
+                    logger.LogError(e, "Failed to update entry");
                     return Problem(e.Message);
                 }
 
@@ -149,7 +149,7 @@ namespace SmartMass.Controller.Api.Controllers
                 }
                 catch (Exception e)
                 {
-                    logger.LogError("Failed to delete entry", e);
+                    logger.LogError(e, "Failed to delete entry");
                     return Problem(e.Message);
                 }
 

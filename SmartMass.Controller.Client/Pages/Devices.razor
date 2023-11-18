@@ -74,7 +74,7 @@
 
 @code {
     [Inject] HttpClient HttpClient { get; set; }
-    private HubConnection? hubConnection;
+    private HubConnection hubConnection;
     private bool hasLoaded = false;
     private List<Device> devices = new List<Device>();
     private readonly Dictionary<string, int> status = new Dictionary<string, int>();

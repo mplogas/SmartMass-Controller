@@ -25,9 +25,9 @@ namespace SmartMass.Controller.Mqtt
 
     public class MqttClient : IMqttClient
     {
-        public EventHandler<MqttMessageReceivedEventArgs> OnMessageReceived;
-        public EventHandler OnClientConnected;
-        public EventHandler OnClientDisconnected;
+        public EventHandler<MqttMessageReceivedEventArgs>? OnMessageReceived;
+        public EventHandler? OnClientConnected;
+        public EventHandler? OnClientDisconnected;
 
         private readonly MQTTnet.Client.IMqttClient client;
         private readonly ILogger<MqttClient> logger;

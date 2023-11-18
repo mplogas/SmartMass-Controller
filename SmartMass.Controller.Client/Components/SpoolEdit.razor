@@ -30,7 +30,7 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Guid SpoolId { get; set; } = Guid.Empty;
     [Parameter] public bool IsNew { get; set; }
-    [Inject] HttpClient HttpClient { get; set; }
+    [Inject] private HttpClient HttpClient { get; set; }
 
     private MudForm form;
     private Spool spool = new Spool();
@@ -38,14 +38,13 @@
     private List<Material> materials = new List<Material>();
     private List<HistoryEvent> history = new List<HistoryEvent>();
     private bool loading = false;
-    private bool success;
-    private string[] errors = { };
-    private readonly List<string> messages = new List<string>();
     private void Close() => MudDialog.CancelAll();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        loading = true;
+        StateHasChanged();
 
         await LoadManufacturersData();
         await LoadMaterialsData();
@@ -58,13 +57,13 @@
                 await LoadHistoryData(SpoolId);
             }
         }
+
+        loading = false;
+        StateHasChanged();
     }
 
     private async Task LoadManufacturersData()
     {
-        loading = true;
-        StateHasChanged();
-
         var response = await HttpClient.GetAsync($"api/Manufacturers");
         if (response.IsSuccessStatusCode)
         {
@@ -73,18 +72,12 @@
             {
                 manufacturers.Clear();
                 manufacturers.AddRange(result);
-                StateHasChanged();
             }
         }
-
-        loading = false;
-        StateHasChanged();
     }
 
     private async Task LoadHistoryData(Guid spoolId)
     {
-        loading = true;
-        StateHasChanged();
         var response = await HttpClient.GetAsync($"api/History/{spoolId}");
         if (response.IsSuccessStatusCode)
         {
@@ -93,19 +86,12 @@
             {
                 history.Clear();
                 history.AddRange(result);
-                StateHasChanged();
             }
         }
-
-        loading = false;
-        StateHasChanged();
     }
 
     private async Task LoadMaterialsData()
     {
-        loading = true;
-        StateHasChanged();
-
         var response = await HttpClient.GetAsync($"api/Materials");
         if (response.IsSuccessStatusCode)
         {
@@ -114,18 +100,12 @@
             {
                 materials.Clear();
                 materials.AddRange(result);
-                StateHasChanged();
             }
         }
-
-        loading = false;
-        StateHasChanged();
     }
 
     private async Task LoadSpoolData(Guid spoolId)
     {
-        loading = true;
-        StateHasChanged();
         var response = await HttpClient.GetAsync($"api/Inventory/{spoolId}");
         if (response.IsSuccessStatusCode)
         {
@@ -133,12 +113,8 @@
             if (result != null)
             {
                 spool = result;
-                StateHasChanged();
             }
         } // TODO: ...something, something error message
-
-        loading = false;
-        StateHasChanged();
     }
 
     private async Task Delete()
