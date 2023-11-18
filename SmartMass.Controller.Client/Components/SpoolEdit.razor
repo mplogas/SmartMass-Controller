@@ -1,4 +1,5 @@
-﻿<MudDialog DisableSidePadding="false" >
+﻿@using System.ComponentModel
+<MudDialog DisableSidePadding="false" >
     <DialogContent>
         <MudGrid>
             @if (loading)
@@ -15,8 +16,34 @@
                         <MudText Typo="Typo.h3">@spool.Name</MudText>
                     </MudPaper>
                 </MudItem>
-
-            }
+                <MudItem xs="12">
+                    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                            <MudGrid>
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.h6">Required</MudText>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudSelect T="string" SelectedValuesChanged="@SelectedMaterialChanged" MultiSelection="false" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Label="Material">
+                                        @foreach (var material in materials)
+                                        {
+                                            <MudSelectItem T="string" Value="material.Name"></MudSelectItem>
+                                        }
+                                        <MudSelectItem T="string" Value="@("Add Material")"></MudSelectItem>
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudSelect T="string" MultiSelection="false" SelectedValuesChanged="@SelectedManufacturerChanged" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Label="Manufacturer">
+                                        @foreach (var manufacturer in manufacturers)
+                                        {
+                                            <MudSelectItem T="string" Value="manufacturer.Name"></MudSelectItem>
+                                        }
+                                        <MudSelectItem T="string" Value="@("Add Manufacturer")"></MudSelectItem>
+                                    </MudSelect>
+                                </MudItem>
+                            </MudGrid>
+                    </MudForm>
+                </MudItem>
+            }   
         </MudGrid>
     </DialogContent>
     <DialogActions>
@@ -37,12 +64,15 @@
     private List<Manufacturer> manufacturers = new List<Manufacturer>();
     private List<Material> materials = new List<Material>();
     private List<HistoryEvent> history = new List<HistoryEvent>();
+    private Material selectedMaterial;
+    private Manufacturer selectedManufacturer;
     private bool loading = false;
+    private bool success;
+    private string[] errors = { };
     private void Close() => MudDialog.CancelAll();
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         loading = true;
         StateHasChanged();
 
@@ -60,6 +90,8 @@
 
         loading = false;
         StateHasChanged();
+
+        await base.OnInitializedAsync();
     }
 
     private async Task LoadManufacturersData()
@@ -173,4 +205,35 @@
         return result;
     }
 
+    private void SelectedMaterialChanged(IEnumerable<string> values)
+    {
+        var material = values.FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(material))
+        {
+            if (material == "Add Material")
+            {
+                //open create material dialog
+            }
+            else
+            {
+                selectedMaterial = materials.FirstOrDefault(m => m.Name == material);
+            }
+        }
+    }
+
+    private void SelectedManufacturerChanged(IEnumerable<string> values)
+    {
+        var manufacturer = values.FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(manufacturer))
+        {
+            if (manufacturer == "Add Manufacturer")
+            {
+                //open create manufacturer dialog
+            }
+            else
+            {
+                selectedManufacturer = manufacturers.FirstOrDefault(m => m.Name == manufacturer);
+            }
+        }
+    }
 }
