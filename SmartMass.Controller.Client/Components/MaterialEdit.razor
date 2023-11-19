@@ -1,0 +1,56 @@
+﻿<MudDialog DisableSidePadding="false">
+    <DialogContent>
+        <MudGrid>
+            @if (loading)
+            {
+                <MudItem xs="12">
+                    <MudProgressCircular Class="ms-n1" Size="Size.Large" Indeterminate="true" />
+                    <MudText Class="ms-2" Typo="Typo.body1">Processing</MudText>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="12">
+                    <MudPaper Class="d-flex align-center justify-center pa-2 mx-2 my-2">
+                        <MudText Typo="Typo.h3">@material.Name</MudText>
+                        </MudPaper>
+                    </MudItem>
+                <MudItem xs="12">
+                    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                        
+                    </MudForm>
+                </MudItem>
+            }
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Close">Close</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="Delete">Delete</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public int MaterialId { get; set; }
+    [Parameter] public bool IsNew { get; set; }
+    [Inject] private HttpClient HttpClient { get; set; }
+
+    private MudForm form;
+    private Material material = new Material();
+    private bool loading = false;
+    private bool success;
+    private string[] errors = { };
+    private void Close() => MudDialog.Cancel();
+
+    private Task Delete()
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task Save()
+    {
+        throw new NotImplementedException();
+    }
+
+}
