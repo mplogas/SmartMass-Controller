@@ -1,0 +1,146 @@
+﻿<MudDialog DisableSidePadding="false">
+    <DialogContent>
+        <MudGrid>
+            @if (loading)
+            {
+                <MudItem xs="12">
+                    <MudProgressCircular Class="ms-n1" Size="Size.Large" Indeterminate="true" />
+                    <MudText Class="ms-2" Typo="Typo.body1">Processing</MudText>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="12">
+                    <MudPaper Class="d-flex align-center justify-center pa-2 mx-2 my-2">
+                        <MudText Typo="Typo.h3">@manufacturer.Name</MudText>
+                        </MudPaper>
+                    </MudItem>
+                <MudItem xs="12">
+                    <MudPaper Class="d-flex align-start pa-2 mx-2 my-2">
+                        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                            <MudTextField @bind-Value="@manufacturer.Name" Label="Manufacturer name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        </MudForm>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Close">Close</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="Delete">Delete</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public int ManufacturerId { get; set; }
+    [Parameter] public bool IsNew { get; set; }
+    [Inject] private HttpClient HttpClient { get; set; }
+
+    private MudForm form;
+    private Manufacturer manufacturer = new Manufacturer();
+    private bool loading = false;
+    private bool success;
+    private string[] errors = { };
+    private void Close() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!IsNew)
+        {
+            await LoadManufacturerData(ManufacturerId);
+        }
+    }
+
+    private async Task Delete()
+    {
+        if (await DeleteManufacturerData()) MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private async Task Save()
+    {
+        if (form.IsValid)
+        {
+            loading = true;
+            StateHasChanged();
+            if (IsNew)
+            {
+                if (await SaveManufacturerData())
+                {
+                    IsNew = false;
+                }
+            }
+            else
+            {
+                await UpdateManufacturerData();
+            }
+            loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task<bool> UpdateManufacturerData()
+    {
+        var response = await HttpClient.PutAsJsonAsync($"api/Manufacturers/{manufacturer.Id}", manufacturer);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Manufacturer>();
+            if (result != null)
+            {
+                manufacturer = result;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private async Task<bool> SaveManufacturerData()
+    {
+        var response = await HttpClient.PostAsJsonAsync($"api/Manufacturers", manufacturer);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Manufacturer>();
+            if (result != null)
+            {
+                manufacturer = result;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private async Task LoadManufacturerData(int manufacturerId)
+    {
+        loading = true;
+        StateHasChanged();
+        var response = await HttpClient.GetAsync($"api/Manufacturers/{manufacturerId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Manufacturer>();
+            if (result != null)
+            {
+                manufacturer = result;
+            }
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    private async Task<bool> DeleteManufacturerData()
+    {
+        loading = true;
+        StateHasChanged();
+
+        var response = await HttpClient.DeleteAsync($"api/Manufacturers/{manufacturer.Id}");
+        var result = response.IsSuccessStatusCode;
+
+        loading = false;
+        StateHasChanged();
+
+        return result;
+    }
+
+}
