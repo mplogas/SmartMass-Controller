@@ -128,8 +128,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-
         if (!IsNew)
         {
             if (!string.IsNullOrWhiteSpace(DeviceId)) await LoadDeviceData(DeviceId);
@@ -183,7 +181,6 @@
                 {
     //MudDialog.Close(DialogResult.Ok(true));
                     IsNew = false;
-                    await LoadDeviceData(device.ClientId);
                 }
             }
             else
@@ -216,7 +213,6 @@
             if (result != null)
             {
                 device = result;
-                StateHasChanged();
             }
         } // TODO: ...something, something error message
 
@@ -234,8 +230,16 @@
     private async Task<bool> SaveDeviceData()
     {
         var response = await HttpClient.PostAsJsonAsync($"api/Devices", device);
-        var result = response.IsSuccessStatusCode;
-        return result;
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Device>();
+            if (result != null)
+            {
+                device = result;
+                return true;
+            }
+        }
+        return false;
     }
 
     private async Task<bool> DeleteDevice()

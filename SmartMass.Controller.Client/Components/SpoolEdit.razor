@@ -90,8 +90,6 @@
 
         loading = false;
         StateHasChanged();
-
-        await base.OnInitializedAsync();
     }
 
     private async Task LoadManufacturersData()
@@ -165,7 +163,6 @@
                 if (await SaveSpoolData())
                 {
                     IsNew = false;
-                    await LoadSpoolData(spool.Id);
                 }
             }
             else
@@ -191,10 +188,17 @@
     private async Task<bool> SaveSpoolData()
     {
         var response = await HttpClient.PostAsJsonAsync($"api/Inventory", spool);
-        var result = response.IsSuccessStatusCode;
-        //TODO: read GUID from response
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Spool>();
+            if (result != null)
+            {
+                spool = result;
+                return true;
+            }
+        }
 
-        return result;
+        return false;
     }
 
     private async Task<bool> DeleteSpoolData()
