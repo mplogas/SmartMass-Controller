@@ -9,6 +9,8 @@
         <MudText Class="ms-2" Typo="Typo.h3">Inventory</MudText>
     </MudItem>
     <MudItem xs="12" Class="d-inline-flex justify-end">
+        <MudButton @onclick="AddMaterial" Variant="Variant.Outlined" Color="Color.Primary">Add new Material</MudButton>
+        <MudButton @onclick="AddManufacturer" Variant="Variant.Outlined" Color="Color.Primary">Add new Manufacturer</MudButton>
         <MudButton @onclick="AddSpool" Variant="Variant.Filled" Color="Color.Primary">Add new Spool</MudButton>
     </MudItem>
     <MudItem xs="12" Class="d-flex align-content-center justify-center flex-wrap">
@@ -152,6 +154,31 @@
         }
     }
 
+    private async Task AddMaterial()
+    {
+        var parameters = new DialogParameters<MaterialEdit>
+        {
+            //{ p => p.MaterialId, -1 },
+            { p => p.IsNew, true }
+        };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, ClassBackground = "dialog-blurred-bg" };
+        var dialog = await DialogService.ShowAsync<Components.MaterialEdit>("Add new material", parameters, options);
+        var result = await dialog.Result;
+    }
+
+    private async Task AddManufacturer()
+    {
+        var parameters = new DialogParameters<ManufacturerEdit>
+        {
+            { p => p.IsNew, true }
+        };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, ClassBackground = "dialog-blurred-bg" };
+        var dialog = await DialogService.ShowAsync<Components.ManufacturerEdit>("Add new manufacturer", parameters, options);
+        var result = await dialog.Result;
+    }
+
     private async Task WriteTag(Guid spoolId)
     {
         var response = await HttpClient.PostAsync($"api/Inventory/write-tag/{spoolId}", null);
@@ -174,5 +201,7 @@
             await LoadData();
         }
     }
+
+
 
 }

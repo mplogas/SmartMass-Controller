@@ -10,14 +10,15 @@
             }
             else
             {
-                <MudItem xs="12">
-                    <MudPaper Class="d-flex align-center justify-center pa-2 mx-2 my-2">
-                        <MudText Typo="Typo.h3">@material.Name</MudText>
-                        </MudPaper>
-                    </MudItem>
-                <MudItem xs="12">
+                <MudItem xs="12" Class="d-flex align-center justify-center mx-2 my-2">
+                    <MudText Typo="Typo.h3">@material.Name</MudText>
+                </MudItem>
+                <MudItem xs="12" Class="d-flex align-center justify-center pa-2 mx-2 my-2">
                     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-                        
+                        <MudTextField @bind-Value="@material.Name" Label="Material name" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-4" />
+                        <MudDivider DividerType="DividerType.Middle" Class="my-4" />
+                        <MudTextField @bind-Value="@material.DefaultNozzleTemp" Label="Default nozzle temperature" Variant="Variant.Outlined" Margin="Margin.Dense" Class="my-4" />
+                        <MudTextField @bind-Value="@material.DefaultBedTemp" Label="Default bed temperature" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-4" />
                     </MudForm>
                 </MudItem>
             }
@@ -37,20 +38,108 @@
     [Inject] private HttpClient HttpClient { get; set; }
 
     private MudForm form;
-    private Material material = new Material();
+    private Material material = new Material() {Name = "n/a"};
     private bool loading = false;
     private bool success;
     private string[] errors = { };
     private void Close() => MudDialog.Cancel();
 
-    private Task Delete()
+    protected override async Task OnInitializedAsync()
     {
-        throw new NotImplementedException();
+        if (!IsNew)
+        {
+            await LoadMaterialData(MaterialId);
+        }
     }
 
-    private Task Save()
+    private async Task Delete()
     {
-        throw new NotImplementedException();
+        if (await DeleteMaterialData()) MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private async Task Save()
+    {
+        if (form.IsValid)
+        {
+            loading = true;
+            StateHasChanged();
+            if (IsNew)
+            {
+                if (await SaveMaterialData())
+                {
+                    IsNew = false;
+                }
+            }
+            else
+            {
+                await UpdateMaterialData();
+            }
+            loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task<bool> UpdateMaterialData()
+    {
+        var response = await HttpClient.PutAsJsonAsync($"api/Materials/{material.Id}", material);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Material>();
+            if (result != null)
+            {
+                material = result;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private async Task<bool> SaveMaterialData()
+    {
+        var response = await HttpClient.PostAsJsonAsync($"api/Materials", material);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Material>();
+            if (result != null)
+            {
+                material = result;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private async Task LoadMaterialData(int materialId)
+    {
+        loading = true;
+        StateHasChanged();
+        var response = await HttpClient.GetAsync($"api/Materials/{materialId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Material>();
+            if (result != null)
+            {
+                material = result;
+            }
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    private async Task<bool> DeleteMaterialData()
+    {
+        loading = true;
+        StateHasChanged();
+
+        var response = await HttpClient.DeleteAsync($"api/Materials/{material.Id}");
+        var result = response.IsSuccessStatusCode;
+
+        loading = false;
+        StateHasChanged();
+
+        return result;
     }
 
 }
