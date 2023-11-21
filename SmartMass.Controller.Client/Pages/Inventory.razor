@@ -1,7 +1,5 @@
 ﻿@page "/inventory"
 @using SmartMass.Controller.Client.Components
-@inject NavigationManager Navigation
-@inject IDialogService DialogService
 
 <PageTitle>Inventory</PageTitle>
 <MudGrid Class="pa-4">
@@ -46,7 +44,8 @@
 </MudGrid>
 
 @code {
-   [Inject] HttpClient HttpClient { get; set; }
+    [Inject] IDialogService DialogService { get; set; }
+    [Inject] HttpClient HttpClient { get; set; }
     private bool hasLoaded = false;
     private List<Spool> spools = new List<Spool>();
     private List<Device> devices = new List<Device>();

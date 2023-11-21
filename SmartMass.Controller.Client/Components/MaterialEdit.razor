@@ -67,12 +67,15 @@
             {
                 if (await SaveMaterialData())
                 {
-                    IsNew = false;
+                    MudDialog.Close(material);
                 }
             }
             else
             {
-                await UpdateMaterialData();
+                if (await UpdateMaterialData())
+                {
+                    MudDialog.Close(material);
+                }
             }
             loading = false;
             StateHasChanged();

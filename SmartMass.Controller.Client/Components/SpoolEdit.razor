@@ -23,7 +23,7 @@
                                     <MudText Typo="Typo.h6">Required</MudText>
                                 </MudItem>
                                 <MudItem xs="6">
-                                    <MudSelect T="string" SelectedValuesChanged="@SelectedMaterialChanged" MultiSelection="false" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Label="Material">
+                                    <MudSelect T="string" @ref="selectMaterial" SelectedValuesChanged="@SelectedMaterialChanged" MultiSelection="false" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Label="Material">
                                         @foreach (var material in materials)
                                         {
                                             <MudSelectItem T="string" Value="material.Name"></MudSelectItem>
@@ -32,7 +32,7 @@
                                     </MudSelect>
                                 </MudItem>
                                 <MudItem xs="6">
-                                    <MudSelect T="string" MultiSelection="false" SelectedValuesChanged="@SelectedManufacturerChanged" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Label="Manufacturer">
+                                    <MudSelect T="string" @ref="selectManufacturer" MultiSelection="false" SelectedValuesChanged="@SelectedManufacturerChanged" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Label="Manufacturer">
                                         @foreach (var manufacturer in manufacturers)
                                         {
                                             <MudSelectItem T="string" Value="manufacturer.Name"></MudSelectItem>
@@ -58,8 +58,11 @@
     [Parameter] public Guid SpoolId { get; set; } = Guid.Empty;
     [Parameter] public bool IsNew { get; set; }
     [Inject] private HttpClient HttpClient { get; set; }
+    [Inject] IDialogService DialogService { get; set; }
 
-    private MudForm form;
+    private MudForm form; 
+    MudSelect<string> selectMaterial;
+    MudSelect<string> selectManufacturer;
     private Spool spool = new Spool();
     private List<Manufacturer> manufacturers = new List<Manufacturer>();
     private List<Material> materials = new List<Material>();
@@ -209,20 +212,39 @@
         return result;
     }
 
-    private void SelectedMaterialChanged(IEnumerable<string> values)
+    private async Task SelectedMaterialChanged(IEnumerable<string> values)
     {
         var material = values.FirstOrDefault();
         if (!string.IsNullOrWhiteSpace(material))
         {
             if (material == "Add Material")
             {
-                //open create material dialog
+                if (await AddMaterialDialog())
+                {
+                    await LoadMaterialsData();
+                    StateHasChanged();
+                }
             }
             else
             {
                 selectedMaterial = materials.FirstOrDefault(m => m.Name == material);
             }
         }
+    }
+
+    private async Task<bool> AddMaterialDialog()
+    {
+        var parameters = new DialogParameters<MaterialEdit>
+        {
+            { p => p.IsNew, true }
+        };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, ClassBackground = "dialog-blurred-bg" };
+        var dialog = await DialogService.ShowAsync<Components.MaterialEdit>("Add new material", parameters, options);
+        var result = await dialog.Result;
+
+        return !result.Canceled;
+
     }
 
     private void SelectedManufacturerChanged(IEnumerable<string> values)
