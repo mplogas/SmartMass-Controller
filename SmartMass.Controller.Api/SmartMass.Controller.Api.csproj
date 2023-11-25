@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>eeb84dc4-6963-4719-9eb8-41fa38998671</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileRunArguments>-v G:\docker\smartmass:/config:rw</DockerfileRunArguments>
+    <DockerfileBuildArguments>-t smartmass/controller:dev</DockerfileBuildArguments>
   </PropertyGroup>
 
   <ItemGroup>

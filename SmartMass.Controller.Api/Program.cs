@@ -15,12 +15,26 @@ namespace SmartMass.Controller.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Configuration
-                .SetBasePath(builder.Environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-                .AddUserSecrets(Assembly.GetExecutingAssembly())
-                .AddEnvironmentVariables().Build();
+            if (File.Exists("/config/appsettings.json"))
+            {
+                builder.Configuration
+                    .SetBasePath("/config")
+                    .AddJsonFile("appsettings.json", optional:false, reloadOnChange: true)
+                    .AddEnvironmentVariables()
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true)
+                    .Build();
+            }
+            else
+            {
+                builder.Configuration
+                    .SetBasePath(builder.Environment.ContentRootPath)
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly())
+                    .AddEnvironmentVariables().Build();
+            }
+
+
 
             builder.Services.AddDbContext<SmartMassDbContext>(options =>
             {
