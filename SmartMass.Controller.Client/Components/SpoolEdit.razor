@@ -12,15 +12,22 @@
             else
             {
                 <MudItem xs="12">
-                    <MudPaper Class="d-flex align-center justify-center pa-2 mx-2 my-2">
-                        <MudText Typo="Typo.h3">@spool.Name</MudText>
-                    </MudPaper>
-                </MudItem>
-                <MudItem xs="12">
                     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
                             <MudGrid>
-                                <MudItem xs="12">
-                                    <MudText Typo="Typo.h6">Required</MudText>
+                                <MudItem xs="1">
+                                    <MudTextField @bind-Value="@spool.Color" Label="Color" InputType="InputType.Color" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                </MudItem>
+                                <MudItem xs="5">
+                                    <MudTextField @bind-Value="@spool.Name" Label="Spool name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField @bind-Value="@spool.EmptySpoolWeight" Label="Empty spool weight" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField @bind-Value="@spool.NozzleTemp" Label="Nozzle temperature" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField @bind-Value="@spool.BedTemp" Label="Bed temperature" Variant="Variant.Outlined" Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudSelect T="string" @ref="selectMaterial" SelectedValuesChanged="@SelectedMaterialChanged" MultiSelection="false" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Label="Material">
@@ -59,6 +66,7 @@
     [Parameter] public bool IsNew { get; set; }
     [Inject] private HttpClient HttpClient { get; set; }
     [Inject] IDialogService DialogService { get; set; }
+    public List<ChartSeries> ChartSeries { get; set; }
 
     private MudForm form; 
     MudSelect<string> selectMaterial;
@@ -117,8 +125,11 @@
             var result = await response.Content.ReadFromJsonAsync<IEnumerable<HistoryEvent>>();
             if (result != null)
             {
-                history.Clear();
+                if(history.Count > 0) history.Clear();
                 history.AddRange(result);
+
+                // ChartSeries.Clear();
+                // ChartSeries.Add(new ChartSeries {Name = spool.Name, Data = result.Select(r => Convert.ToDouble(r.Value)).ToArray()});
             }
         }
     }
@@ -157,7 +168,7 @@
 
     private async Task Save()
     {
-        if (form.IsValid)
+        if (success)
         {
             loading = true;
             StateHasChanged();
@@ -178,6 +189,9 @@
             loading = false;
             StateHasChanged();
         }
+
+
+
     }
 
     private async Task<bool> UpdateSpoolData()
@@ -247,14 +261,18 @@
 
     }
 
-    private void SelectedManufacturerChanged(IEnumerable<string> values)
+    private async Task SelectedManufacturerChanged(IEnumerable<string> values)
     {
         var manufacturer = values.FirstOrDefault();
         if (!string.IsNullOrWhiteSpace(manufacturer))
         {
             if (manufacturer == "Add Manufacturer")
             {
-                //open create manufacturer dialog
+                if (await AddManufacturerDialog())
+                {
+                    await LoadManufacturersData();
+                    StateHasChanged();
+                }
             }
             else
             {
@@ -262,4 +280,19 @@
             }
         }
     }
+
+    private async Task<bool> AddManufacturerDialog()
+    {
+        var parameters = new DialogParameters<ManufacturerEdit>
+        {
+            { p => p.IsNew, true }
+        };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, ClassBackground = "dialog-blurred-bg" };
+        var dialog = await DialogService.ShowAsync<Components.ManufacturerEdit>("Add new manufacturer", parameters, options);
+        var result = await dialog.Result;
+
+        return !result.Canceled;
+    }
+
 }

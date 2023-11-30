@@ -10,9 +10,6 @@
             }
             else
             {
-                <MudItem xs="12" Class="d-flex align-center justify-center mx-2 my-2">
-                    <MudText Typo="Typo.h3">@material.Name</MudText>
-                </MudItem>
                 <MudItem xs="12" Class="d-flex align-center justify-center pa-2 mx-2 my-2">
                     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
                         <MudTextField @bind-Value="@material.Name" Label="Material name" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-4" />
